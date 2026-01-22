@@ -14,7 +14,7 @@ from pathlib import Path
 import json
 import warnings
 
-from ..tokenizer import SequenceTokenizer, ParameterSpec, Trial
+from data.tokenizer import SequenceTokenizer, ParameterSpec, Trial
 
 
 def try_import_hpobench():

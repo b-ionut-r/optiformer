@@ -11,7 +11,7 @@ from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
 from .optiformer import OptiFormer
-from ..data.tokenizer import SequenceTokenizer, Trial
+from data.tokenizer import SequenceTokenizer, Trial
 
 
 @dataclass

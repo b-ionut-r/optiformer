@@ -19,8 +19,8 @@ from torch.cuda.amp import autocast
 import numpy as np
 from typing import Dict, Any, Optional, Sequence, List
 
-from ..model import OptiFormer
-from ..data.tokenizer import SequenceTokenizer, Trial
+from model import OptiFormer
+from data.tokenizer import SequenceTokenizer, Trial
 
 
 class OptiFormerSampler(BaseSampler):

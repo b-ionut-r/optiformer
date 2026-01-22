@@ -12,7 +12,7 @@ from typing import List, Dict, Optional, Tuple, Any
 import random
 import numpy as np
 
-from ..tokenizer import SequenceTokenizer, ParameterSpec, Trial
+from data.tokenizer import SequenceTokenizer, ParameterSpec, Trial
 
 
 class TrajectoryDataset(Dataset):

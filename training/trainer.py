@@ -16,8 +16,8 @@ import time
 import json
 import numpy as np
 
-from ..model import OptiFormer
-from ..data.datasets import collate_fn
+from model import OptiFormer
+from data.datasets import collate_fn
 
 
 class TrainingConfig:

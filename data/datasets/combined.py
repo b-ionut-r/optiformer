@@ -26,7 +26,7 @@ import numpy as np
 import warnings
 import logging
 
-from ..tokenizer import SequenceTokenizer, Trial
+from data.tokenizer import SequenceTokenizer, Trial
 from .synthetic import TrajectoryDataset, collate_fn
 
 logger = logging.getLogger(__name__)
@@ -385,7 +385,7 @@ def generate_real_world_data(
 
     if need_fallback:
         try:
-            from ..generators.simulated_realworld import (
+            from data.generators.simulated_realworld import (
                 generate_simulated_real_world_data,
                 DEFAULT_CONFIGS,
             )

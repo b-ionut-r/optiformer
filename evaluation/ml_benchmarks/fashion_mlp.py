@@ -165,7 +165,7 @@ class FashionMNISTBenchmark:
     @property
     def param_specs(self):
         """Get parameter specifications for tokenizer."""
-        from ...data.tokenizer import ParameterSpec
+        from data.tokenizer import ParameterSpec
         return [
             ParameterSpec('hidden_size', 64, 512, is_integer=True),
             ParameterSpec('num_layers', 1, 4, is_integer=True),

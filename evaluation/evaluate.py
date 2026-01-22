@@ -14,7 +14,7 @@ from pathlib import Path
 import time
 
 from .synthetic_benchmarks import BENCHMARKS, normalize_function
-from ..samplers import OptiFormerSampler
+from samplers import OptiFormerSampler
 
 # Suppress Optuna logs
 optuna.logging.set_verbosity(optuna.logging.WARNING)

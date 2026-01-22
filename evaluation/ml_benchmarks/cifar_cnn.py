@@ -224,7 +224,7 @@ class CIFAR10Benchmark:
     @property
     def param_specs(self):
         """Get parameter specifications for tokenizer."""
-        from ...data.tokenizer import ParameterSpec
+        from data.tokenizer import ParameterSpec
         return [
             ParameterSpec('num_conv_layers', 2, 5, is_integer=True),
             ParameterSpec('num_filters', 16, 128, is_integer=True),
