@@ -26,6 +26,7 @@ def generate_yahpo_trajectories(output_path: Path, seed: int = 42) -> int:
     """Generate trajectories from YAHPO-Gym benchmarks (60% of total data)."""
     try:
         from data.datasets.benchmark_zoo import YAHPOLoader
+        import subprocess
         
         # Check if YAHPO is available
         try:
@@ -35,8 +36,24 @@ def generate_yahpo_trajectories(output_path: Path, seed: int = 42) -> int:
             print("  Install with: pip install yahpo-gym")
             return 0
 
+        # Setup local YAHPO data
+        yahpo_data_path = Path("data/yahpo_data")
+        if not yahpo_data_path.exists() or not any(yahpo_data_path.iterdir()):
+            print(f"  Downloading YAHPO data to {yahpo_data_path}...")
+            try:
+                subprocess.run(
+                    ["git", "clone", "https://github.com/slds-lmu/yahpo_data.git", str(yahpo_data_path)],
+                    check=True,
+                    capture_output=True
+                )
+            except subprocess.CalledProcessError as e:
+                print(f"  WARNING: Failed to download YAHPO data: {e}")
+                print("  Please download manually: https://github.com/slds-lmu/yahpo_data")
+                return 0
+
         print(f"  Generating YAHPO trajectories...")
-        loader = YAHPOLoader()
+        # Pass the explicit data path to the loader
+        loader = YAHPOLoader(data_path=str(yahpo_data_path.resolve()))
         total = 0
 
         # Generate 3000 total YAHPO trajectories across 4 scenarios
