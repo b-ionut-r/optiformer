@@ -1,0 +1,197 @@
+# OptiFormer Full Training Configuration
+# =======================================
+# Use this configuration after smoke test passes
+
+project:
+  name: "optiformer-full"
+  seed: 42
+  device: "cuda"
+  output_dir: "./outputs/full_training"
+
+# Tokenizer Configuration
+tokenizer:
+  num_bins: 1000
+  max_categorical: 200
+  special_tokens:
+    pad: 0
+    bos: 1
+    eos: 2
+    trial_sep: 3
+    score: 4
+    target_regret_0: 5
+    target_regret_1: 6
+    target_regret_2: 7
+  param_token_start: 1200
+
+# Data Generation (Full Scale)
+# CRITICAL: Real-world data dominates for production models
+# Synthetic data provides coverage for edge cases only
+data:
+  # Target composition: 70% real, 30% synthetic
+  synthetic_weight: 0.3       # Only 30% synthetic for production
+
+  synthetic:
+    gp_functions: 20000       # Reduced - synthetic is supplementary
+    symbolic_functions: 20000
+    trials_per_function: 128
+    dimensions: [5, 8, 10, 12, 15]  # Match real HPO dimensionality
+    noise_std: 0.05           # Higher noise to match real training variance
+
+    gp_config:
+      kernels: ["rbf", "matern_0.5", "matern_1.5", "matern_2.5"]
+      lengthscale_prior: "lognormal"
+
+    symbolic_config:
+      operators: ["+", "-", "*", "/", "sin", "cos", "exp", "log", "abs", "sqrt"]
+      max_depth: 7
+
+  real_world:
+    # HPOBench - FCNet neural network benchmarks
+    use_hpobench: true
+    hpobench_benchmarks:
+      - "fcnet_protein"
+      - "fcnet_naval"
+      - "fcnet_slice"
+    hpobench_traces_per_benchmark: 3000
+
+    # YAHPO Gym - MOST DIVERSE (LCBench, SVM, XGBoost, RandomForest, NAS)
+    use_yahpo: true
+    yahpo_scenarios:
+      - "lcbench"           # Learning curves on 35 OpenML datasets
+      - "rbv2_svm"          # SVM tuning on 103 datasets
+      - "rbv2_xgboost"      # XGBoost tuning on 103 datasets
+      - "rbv2_ranger"       # RandomForest tuning on 103 datasets
+    yahpo_traces_per_scenario: 2000
+
+    # JAHS-Bench-201 - Architecture + Hyperparameter joint search
+    use_jahs: true
+    jahs_tasks:
+      - "cifar10"
+      - "fashion_mnist"
+      - "colorectal_histology"
+    jahs_traces_per_task: 1500
+
+    # OpenML - Historical experiment traces
+    use_openml: true
+    openml_task_ids: [3, 12, 31, 53, 3917, 9952, 9977, 9981, 14965, 146212]
+    openml_configs_per_task: 500
+
+# Model Configuration (Base for Full Training)
+model:
+  size: "base"
+
+  base:
+    vocab_size: 2000
+    hidden_size: 512
+    intermediate_size: 2048
+    num_hidden_layers: 8
+    num_attention_heads: 8
+    max_position_embeddings: 2048
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~50M parameters
+
+  large:
+    vocab_size: 3000
+    hidden_size: 768
+    intermediate_size: 3072
+    num_hidden_layers: 12
+    num_attention_heads: 12
+    max_position_embeddings: 4096
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~150M parameters
+
+# Training Configuration
+training:
+  batch_size: 256
+  gradient_accumulation_steps: 4
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+
+  max_steps: 50000
+  warmup_steps: 1000
+  lr_scheduler: "cosine"
+
+  fp16: false
+  bf16: true
+
+  logging_steps: 100
+  eval_steps: 2000
+  save_steps: 5000
+
+  early_stopping:
+    enabled: true
+    patience: 5
+    min_delta: 0.0005
+
+# Evaluation Configuration
+evaluation:
+  synthetic_benchmarks:
+    functions:
+      - name: "sphere"
+        dimensions: [2, 5, 10]
+        bounds: [-5.0, 5.0]
+        optimum: 0.0
+
+      - name: "rastrigin"
+        dimensions: [2, 5, 10]
+        bounds: [-5.12, 5.12]
+        optimum: 0.0
+
+      - name: "rosenbrock"
+        dimensions: [2, 5, 10]
+        bounds: [-5.0, 10.0]
+        optimum: 0.0
+
+      - name: "ackley"
+        dimensions: [2, 5, 10]
+        bounds: [-5.0, 5.0]
+        optimum: 0.0
+
+      - name: "levy"
+        dimensions: [2, 5, 10]
+        bounds: [-10.0, 10.0]
+        optimum: 0.0
+
+      - name: "branin"
+        dimensions: 2
+        bounds: [[-5.0, 10.0], [0.0, 15.0]]
+        optimum: 0.397887
+
+    num_trials: 100
+    num_seeds: 20
+
+  ml_benchmarks:
+    mnist_mlp:
+      enabled: true
+      epochs_per_trial: 10
+      num_trials: 100
+
+    cifar_cnn:
+      enabled: true
+      epochs_per_trial: 20
+      num_trials: 100
+
+    fashion_mlp:
+      enabled: true
+      epochs_per_trial: 10
+      num_trials: 100
+
+    tabular_xgb:
+      enabled: true
+      num_trials: 100
+
+  baselines:
+    - "random"
+    - "tpe"
+    - "cmaes"
+    - "botorch"
+
+# Comparison Thresholds
+thresholds:
+  tokenizer_roundtrip_error: 0.001
+  min_loss_reduction: 0.7
+  vs_random_win_rate: 0.9
+  vs_tpe_regret_ratio: 1.5

@@ -1,0 +1,509 @@
+# OptiFormer-Lite Smoke Test Configuration
+# =========================================
+# This config is designed to be COMPREHENSIVE - it validates the full pipeline
+# including real-world ML hyperparameter optimization scenarios.
+
+project:
+  name: "optiformer-lite-smoke-test"
+  seed: 42
+  device: "cuda"  # or "cpu" for debugging
+  output_dir: "./outputs/smoke_test"
+
+# Tokenizer Configuration
+tokenizer:
+  num_bins: 1000              # Quantization bins for floats (0.1% resolution)
+  max_categorical: 100        # Max categorical tokens per parameter
+  special_tokens:
+    pad: 0
+    bos: 1
+    eos: 2
+    trial_sep: 3
+    score: 4
+    target_regret_0: 5        # Optimal performance target
+    target_regret_1: 6        # Good performance target
+    target_regret_2: 7        # Acceptable performance target
+  param_token_start: 1100     # Where <PARAM_xxx> tokens start
+
+# =============================================================================
+# DATA CONFIGURATION
+# =============================================================================
+# CRITICAL: Real-world data is ESSENTIAL for generalization.
+# Models trained on synthetic-only data WILL FAIL on real HPO tasks.
+#
+# Recommended proportions:
+#   - Production: 70% real-world, 30% synthetic
+#   - Smoke test: 60% real-world, 40% synthetic (faster, still validates)
+#
+# If real-world data sources are unavailable, the system will generate
+# "simulated real-world" trajectories using realistic ML hyperparameter
+# spaces to partially compensate.
+# =============================================================================
+
+data:
+  # Data composition - THIS IS CRITICAL FOR MODEL QUALITY
+  # 0.35 = 35% synthetic, 65% real-world (or simulated real-world)
+  synthetic_weight: 0.35
+
+  # Enforce real-world data: if true, smoke test fails without real data sources
+  # If false, falls back to simulated real-world data
+  require_real_world: false
+
+  # Minimum real-world trajectories required (warns if below threshold)
+  min_real_world_trajectories: 500
+
+  synthetic:
+    # Moderate synthetic data - supplements real-world, doesn't replace it
+    gp_functions: 1200
+    symbolic_functions: 800
+
+    # FIXED: Dimensions must match evaluation dimensions
+    # Training and eval now use same dimension set for consistency
+    dimensions: [2, 3, 5, 8, 10, 15]
+
+    # Varied trajectory lengths to improve robustness
+    trials_per_function: [32, 48, 64]  # Randomly selected per trajectory
+
+    # Varied noise levels to match real-world variance
+    noise_std: [0.02, 0.05, 0.08]  # Randomly selected per trajectory
+
+    gp_config:
+      kernels: ["rbf", "matern_1.5", "matern_2.5", "matern_0.5"]
+      lengthscale_prior: "lognormal"  # LogNormal(0, 1)
+      output_variance: [0.5, 1.0, 2.0]  # Varied function scales
+
+    symbolic_config:
+      operators: ["+", "-", "*", "/", "sin", "cos", "exp", "log", "sqrt"]
+      max_depth: 6
+
+  # =========================================================================
+  # REAL-WORLD DATA SOURCES
+  # =========================================================================
+  # Priority order: HPOBench > YAHPO > Simulated Real-World
+  # At least one source should provide data for valid smoke test results.
+
+  real_world:
+    # -------------------------------------------------------------------------
+    # HPOBench - Tabular benchmarks with precomputed FCNet results
+    # Install: pip install hpobench
+    # These provide REAL neural network training results, highly valuable.
+    # -------------------------------------------------------------------------
+    use_hpobench: true
+    hpobench_benchmarks:
+      - "fcnet_protein"       # Protein structure prediction
+      - "fcnet_naval"         # Naval propulsion efficiency
+      - "fcnet_slice"         # CT slice localization
+    hpobench_traces_per_benchmark: 300
+    hpobench_trials_per_trace: 64
+
+    # -------------------------------------------------------------------------
+    # YAHPO Gym - Surrogate benchmarks for diverse ML algorithms
+    # Install: pip install yahpo-gym
+    # Provides SVM, XGBoost, Random Forest, and neural network surrogates.
+    # -------------------------------------------------------------------------
+    use_yahpo: true
+    yahpo_scenarios:
+      - "lcbench"             # Neural network learning curves
+      - "rbv2_svm"            # SVM hyperparameters
+      - "rbv2_xgboost"        # XGBoost hyperparameters
+      - "rbv2_ranger"         # Random Forest hyperparameters
+    yahpo_traces_per_scenario: 250
+    yahpo_fidelity: "full"    # Use full fidelity evaluations
+
+    # -------------------------------------------------------------------------
+    # JAHS-Bench-201 - Joint Architecture and Hyperparameter Search
+    # Install: pip install jahs-bench
+    # Slower but provides architecture + hyperparameter joint optimization data.
+    # -------------------------------------------------------------------------
+    use_jahs: false           # Enable for full training, disable for quick smoke test
+    jahs_traces: 200
+
+    # -------------------------------------------------------------------------
+    # OpenML - Historical ML experiment traces
+    # Install: pip install openml>=0.14.0
+    # Large collection of real experiment logs from the ML community.
+    # -------------------------------------------------------------------------
+    use_openml: false         # Enable for production training
+    openml_task_ids: [3, 12, 31, 53, 3917, 9981, 146820]
+    openml_configs_per_task: 100
+
+    # -------------------------------------------------------------------------
+    # SIMULATED REAL-WORLD DATA (Fallback)
+    # When external data sources are unavailable, generate trajectories
+    # using realistic ML hyperparameter spaces. Not as good as real data,
+    # but better than pure synthetic functions.
+    # -------------------------------------------------------------------------
+    use_simulated_real_world: true  # Fallback when HPOBench/YAHPO unavailable
+    simulated_configs:
+      # Neural Network Hyperparameters (most common real-world use case)
+      - name: "neural_network_classification"
+        n_trajectories: 400
+        params:
+          learning_rate: {type: "float", low: 1e-5, high: 0.1, log: true}
+          batch_size: {type: "int", low: 16, high: 512, log: true}
+          num_layers: {type: "int", low: 1, high: 8}
+          hidden_size: {type: "int", low: 32, high: 1024, log: true}
+          dropout: {type: "float", low: 0.0, high: 0.7}
+          weight_decay: {type: "float", low: 1e-6, high: 0.1, log: true}
+          optimizer: {type: "categorical", choices: ["adam", "sgd", "adamw", "rmsprop"]}
+          activation: {type: "categorical", choices: ["relu", "gelu", "tanh", "silu"]}
+
+      # XGBoost Hyperparameters
+      - name: "xgboost_tuning"
+        n_trajectories: 300
+        params:
+          learning_rate: {type: "float", low: 0.01, high: 0.3, log: true}
+          max_depth: {type: "int", low: 3, high: 15}
+          n_estimators: {type: "int", low: 50, high: 1000, log: true}
+          subsample: {type: "float", low: 0.5, high: 1.0}
+          colsample_bytree: {type: "float", low: 0.5, high: 1.0}
+          min_child_weight: {type: "int", low: 1, high: 10}
+          reg_alpha: {type: "float", low: 1e-8, high: 10.0, log: true}
+          reg_lambda: {type: "float", low: 1e-8, high: 10.0, log: true}
+
+      # Random Forest Hyperparameters
+      - name: "random_forest_tuning"
+        n_trajectories: 200
+        params:
+          n_estimators: {type: "int", low: 50, high: 500}
+          max_depth: {type: "int", low: 5, high: 50}
+          min_samples_split: {type: "int", low: 2, high: 20}
+          min_samples_leaf: {type: "int", low: 1, high: 10}
+          max_features: {type: "categorical", choices: ["sqrt", "log2", "0.5", "0.8"]}
+          bootstrap: {type: "categorical", choices: ["true", "false"]}
+
+      # SVM Hyperparameters
+      - name: "svm_tuning"
+        n_trajectories: 200
+        params:
+          C: {type: "float", low: 1e-4, high: 1000.0, log: true}
+          gamma: {type: "float", low: 1e-6, high: 10.0, log: true}
+          kernel: {type: "categorical", choices: ["rbf", "poly", "sigmoid"]}
+          degree: {type: "int", low: 2, high: 5}  # for poly kernel
+
+# Model Configuration (Nano for Smoke Test)
+model:
+  size: "nano"                # Options: nano, small, base
+
+  nano:
+    vocab_size: 1200
+    hidden_size: 256
+    intermediate_size: 1024
+    num_hidden_layers: 4
+    num_attention_heads: 4
+    max_position_embeddings: 512
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~8M parameters
+
+  small:
+    vocab_size: 1500
+    hidden_size: 384
+    intermediate_size: 1536
+    num_hidden_layers: 6
+    num_attention_heads: 6
+    max_position_embeddings: 1024
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~25M parameters
+
+  base:
+    vocab_size: 2000
+    hidden_size: 512
+    intermediate_size: 2048
+    num_hidden_layers: 8
+    num_attention_heads: 8
+    max_position_embeddings: 2048
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~50M parameters
+
+# Training Configuration
+training:
+  # Optimization
+  batch_size: 128
+  gradient_accumulation_steps: 1
+  learning_rate: 3.0e-4
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+
+  # Schedule
+  max_steps: 5000            # ~30 min on RTX 4090
+  warmup_steps: 200
+  lr_scheduler: "cosine"
+
+  # Precision
+  fp16: true
+  bf16: false                # Set true if available (better stability)
+
+  # Logging
+  logging_steps: 50
+  eval_steps: 500
+  save_steps: 1000
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 3              # Stop if no improvement for 3 evals
+    min_delta: 0.001
+
+# =============================================================================
+# EVALUATION CONFIGURATION
+# =============================================================================
+# Comprehensive evaluation across multiple dimensions, including dimensions
+# seen during training AND unseen dimensions to test generalization.
+
+evaluation:
+  # -------------------------------------------------------------------------
+  # Synthetic Benchmarks - Standard optimization test functions
+  # FIXED: Now tests dimensions that MATCH training dimensions
+  # -------------------------------------------------------------------------
+  synthetic_benchmarks:
+    # Test multiple dimensions - should match training dims [2, 3, 5, 8, 10, 15]
+    dimensions_to_test: [2, 3, 5, 8, 10]  # Include 2 (edge), exclude 15 (slow)
+
+    functions:
+      - name: "sphere"
+        bounds: [-5.0, 5.0]
+        optimum: 0.0
+        difficulty: "easy"
+
+      - name: "rastrigin"
+        bounds: [-5.12, 5.12]
+        optimum: 0.0
+        difficulty: "hard"      # Highly multimodal
+
+      - name: "rosenbrock"
+        bounds: [-5.0, 10.0]
+        optimum: 0.0
+        difficulty: "medium"    # Curved valley
+
+      - name: "ackley"
+        bounds: [-5.0, 5.0]
+        optimum: 0.0
+        difficulty: "hard"      # Many local minima
+
+      - name: "levy"
+        bounds: [-10.0, 10.0]
+        optimum: 0.0
+        difficulty: "medium"
+
+      - name: "griewank"
+        bounds: [-600.0, 600.0]
+        optimum: 0.0
+        difficulty: "hard"
+
+    num_trials: 50           # Trials per optimization run
+    num_seeds: 5             # Repeat each experiment 5 times
+
+  # -------------------------------------------------------------------------
+  # Categorical Parameter Tests - CRITICAL for real-world HPO
+  # Tests handling of discrete choices like optimizer type, activation, etc.
+  # -------------------------------------------------------------------------
+  categorical_benchmarks:
+    enabled: true
+
+    test_cases:
+      # Mixed continuous + categorical (most realistic)
+      - name: "mixed_nn_config"
+        description: "Neural network with mixed hyperparameter types"
+        params:
+          learning_rate: {type: "float", low: 1e-5, high: 0.1, log: true}
+          hidden_size: {type: "int", low: 32, high: 512}
+          dropout: {type: "float", low: 0.0, high: 0.5}
+          optimizer: {type: "categorical", choices: ["adam", "sgd", "adamw"]}
+          activation: {type: "categorical", choices: ["relu", "tanh", "gelu"]}
+        n_trials: 30
+        n_seeds: 3
+
+      # Pure categorical (edge case)
+      - name: "pure_categorical"
+        description: "All categorical parameters"
+        params:
+          model_type: {type: "categorical", choices: ["mlp", "cnn", "transformer"]}
+          optimizer: {type: "categorical", choices: ["adam", "sgd", "rmsprop", "adamw"]}
+          scheduler: {type: "categorical", choices: ["cosine", "step", "exponential", "none"]}
+          normalization: {type: "categorical", choices: ["batch", "layer", "none"]}
+        n_trials: 25
+        n_seeds: 3
+
+      # Many categories (stress test)
+      - name: "many_categories"
+        description: "Parameter with many categorical choices"
+        params:
+          architecture: {type: "categorical", choices: ["resnet18", "resnet34", "resnet50", "vgg16", "vgg19", "efficientnet_b0", "efficientnet_b1", "mobilenet_v2"]}
+          augmentation: {type: "categorical", choices: ["none", "basic", "autoaugment", "randaugment", "trivialaugment"]}
+          learning_rate: {type: "float", low: 1e-5, high: 0.01, log: true}
+        n_trials: 30
+        n_seeds: 3
+
+  # -------------------------------------------------------------------------
+  # Edge Case Tests - Robustness validation
+  # -------------------------------------------------------------------------
+  edge_case_tests:
+    enabled: true
+
+    tests:
+      # Out-of-bounds handling
+      - name: "bounds_handling"
+        description: "Test clipping of out-of-bounds suggestions"
+        enabled: true
+
+      # Long trajectory handling
+      - name: "long_trajectories"
+        description: "Test with 100+ trial histories"
+        trajectory_lengths: [50, 100, 150]
+        enabled: true
+
+      # Score edge cases
+      - name: "score_edge_cases"
+        description: "Test with extreme/invalid scores"
+        test_nan: true
+        test_inf: true
+        test_negative: true
+        test_very_small: true  # scores < 1e-10
+        enabled: true
+
+      # Duplicate trials
+      - name: "duplicate_handling"
+        description: "Test behavior with duplicate configurations"
+        enabled: true
+
+      # Single dimension (minimum)
+      - name: "single_dimension"
+        description: "Test with d=1 (edge case)"
+        enabled: true
+
+      # High dimension (stress test)
+      - name: "high_dimension"
+        description: "Test with d=20 (beyond training)"
+        dimensions: 20
+        enabled: true
+
+  # -------------------------------------------------------------------------
+  # Real ML Benchmarks - Actual hyperparameter optimization tasks
+  # These test the model on REAL machine learning optimization scenarios.
+  # -------------------------------------------------------------------------
+  ml_benchmarks:
+    mnist_mlp:
+      enabled: true
+      epochs_per_trial: 5    # Fast evaluation
+      num_trials: 30
+      search_space:
+        hidden_size: {type: "int", low: 32, high: 512, log: true}
+        num_layers: {type: "int", low: 1, high: 4}
+        learning_rate: {type: "float", low: 1e-5, high: 1e-1, log: true}
+        dropout: {type: "float", low: 0.0, high: 0.5}
+        batch_size: {type: "int", low: 32, high: 256, log: true}
+        optimizer: {type: "categorical", choices: ["adam", "sgd"]}
+
+    cifar_cnn:
+      enabled: true
+      epochs_per_trial: 10
+      num_trials: 30
+      search_space:
+        num_conv_layers: {type: "int", low: 2, high: 5}
+        num_filters: {type: "int", low: 16, high: 128, log: true}
+        kernel_size: {type: "categorical", choices: [3, 5]}
+        fc_size: {type: "int", low: 64, high: 512, log: true}
+        learning_rate: {type: "float", low: 1e-5, high: 1e-2, log: true}
+        dropout: {type: "float", low: 0.0, high: 0.5}
+        batch_size: {type: "int", low: 32, high: 128, log: true}
+
+    fashion_mlp:
+      enabled: true
+      epochs_per_trial: 5
+      num_trials: 30
+      search_space:
+        hidden_size: {type: "int", low: 64, high: 512, log: true}
+        num_layers: {type: "int", low: 1, high: 4}
+        learning_rate: {type: "float", low: 1e-5, high: 1e-1, log: true}
+        dropout: {type: "float", low: 0.0, high: 0.5}
+        activation: {type: "categorical", choices: ["relu", "tanh", "gelu"]}
+
+    # NEW: XGBoost benchmark - common real-world use case
+    xgboost_classification:
+      enabled: true
+      num_trials: 30
+      dataset: "breast_cancer"  # sklearn dataset
+      search_space:
+        learning_rate: {type: "float", low: 0.01, high: 0.3, log: true}
+        max_depth: {type: "int", low: 3, high: 10}
+        n_estimators: {type: "int", low: 50, high: 500, log: true}
+        subsample: {type: "float", low: 0.5, high: 1.0}
+        colsample_bytree: {type: "float", low: 0.5, high: 1.0}
+        min_child_weight: {type: "int", low: 1, high: 10}
+
+  baselines:
+    - "random"               # Random search
+    - "tpe"                  # Optuna TPE (teacher algorithm)
+    - "cmaes"                # CMA-ES (evolutionary)
+
+# =============================================================================
+# COMPARISON THRESHOLDS
+# =============================================================================
+# Success criteria for the smoke test. All must pass for the test to succeed.
+
+thresholds:
+  # Tokenizer quality
+  tokenizer_roundtrip_error: 0.001  # Max allowed error (<0.1%)
+
+  # Training convergence
+  min_loss_reduction: 0.5           # Training loss must drop 50% (relaxed for smoke test)
+
+  # Synthetic benchmark performance
+  vs_random_win_rate_synthetic: 0.55  # Must beat random >55% on synthetic
+  vs_tpe_regret_ratio: 2.5            # Must be within 2.5x of TPE regret
+
+  # ML benchmark performance (harder, so more lenient)
+  vs_random_win_rate_ml: 0.45         # Must beat random >45% on ML benchmarks
+
+  # Categorical handling
+  categorical_valid_rate: 0.95        # 95% of categorical suggestions must be valid
+
+  # Edge case handling
+  edge_case_pass_rate: 0.9            # 90% of edge case tests must pass
+
+  # Real-world data minimum
+  min_real_world_data_ratio: 0.5      # At least 50% of training data should be real-world
+
+# =============================================================================
+# SMOKE TEST PHASES
+# =============================================================================
+# Define which phases to run and their order.
+
+smoke_test_phases:
+  - name: "tokenizer"
+    enabled: true
+    description: "Validate tokenizer roundtrip accuracy"
+
+  - name: "data_generation"
+    enabled: true
+    description: "Generate training data (synthetic + real-world)"
+
+  - name: "training"
+    enabled: true
+    description: "Train model and validate convergence"
+
+  - name: "inference_behavior"
+    enabled: true
+    description: "Test model inference and generation"
+
+  - name: "synthetic_evaluation"
+    enabled: true
+    description: "Evaluate on synthetic benchmarks"
+
+  - name: "categorical_evaluation"
+    enabled: true
+    description: "Test categorical parameter handling"
+
+  - name: "edge_case_evaluation"
+    enabled: true
+    description: "Test edge cases and robustness"
+
+  - name: "ml_evaluation"
+    enabled: true
+    description: "Evaluate on real ML benchmarks"
+
+  - name: "optuna_integration"
+    enabled: true
+    description: "Test Optuna sampler integration"

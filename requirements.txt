@@ -1,0 +1,79 @@
+# OptiFormer-Lite Dependencies
+# ============================
+
+# Core ML
+torch>=2.1.0
+transformers>=4.36.0
+
+# Optimization
+optuna>=3.4.0
+gpytorch>=1.11
+
+# Data & Computation
+numpy>=1.24.0
+scipy>=1.11.0
+pandas>=2.0.0
+
+# ML Models for Testing
+torchvision>=0.16.0
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+
+# Utilities
+pyyaml>=6.0
+tqdm>=4.66.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Dev
+black
+isort
+
+# =============================================================================
+# REAL-WORLD HPO DATA SOURCES
+# =============================================================================
+# These are CRITICAL for model generalization to real HPO tasks.
+# Models trained on synthetic-only data WILL FAIL on real problems.
+#
+# Install priority (easiest to hardest):
+#   1. yahpo-gym - Best coverage, easy install
+#   2. openml - Historical traces, easy install
+#   3. hpobench - FCNet benchmarks, may need extra setup
+#   4. jahs-bench - Architecture search, git install required
+
+# YAHPO Gym - RECOMMENDED: 14 scenarios, ~700 benchmark instances
+# Includes: LCBench, SVM, XGBoost, RandomForest, NAS-Bench-301
+# Easiest to use and most diverse
+yahpo-gym>=1.0.0
+
+# OpenML - Historical ML experiment traces from the community
+# Large collection of real experiment logs
+openml>=0.14.0
+
+# HPOBench - FCNet tabular benchmarks (neural network training results)
+# Note: Some benchmarks require Singularity containers
+# If install fails, the simulated fallback will be used
+hpobench>=0.0.8
+
+# ConfigSpace - Required by HPOBench and YAHPO
+ConfigSpace>=0.7.0
+
+# =============================================================================
+# OPTIONAL: Additional HPO Benchmarks
+# =============================================================================
+# Uncomment if needed for more comprehensive training data
+
+# JAHS-Bench-201 - Joint Architecture + Hyperparameter Search
+# Install manually: pip install git+https://github.com/automl/jahs_bench_201.git
+
+# NAS-Bench-201 - Neural Architecture Search benchmark
+# Install manually: pip install nas-bench-201
+
+# =============================================================================
+# Quick install command for all real-world data sources:
+# pip install yahpo-gym openml hpobench ConfigSpace
+# =============================================================================

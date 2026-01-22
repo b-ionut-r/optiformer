@@ -1,0 +1,342 @@
+OptiFormer-Lite: A Comprehensive Implementation Protocol for Foundation Model-Based Hyperparameter Optimization
+1. Introduction: The Paradigm Shift in Automated Machine Learning
+The field of Automated Machine Learning (AutoML) is currently undergoing a seismic transformation, shifting from iterative, algorithmic search methods toward data-driven, meta-learned foundation models. For the past decade, the optimization of hyperparameters (HPO)—the critical process of tuning learning rates, batch sizes, and architectural configurations to maximize model performance—has been dominated by "black-box" techniques. Algorithms such as Bayesian Optimization (BO) utilizing Gaussian Processes (GPs) and the Tree-structured Parzen Estimator (TPE), the latter being the default engine of the industry-standard Optuna framework, have served as the standard bearers of this domain. While statistically rigorous, these methods operate under a fundamental constraint: the tabula rasa assumption. They treat every new optimization task as an entirely novel problem, devoid of historical context, requiring significant computational expenditure to "warm up" and construct a reliable surrogate model of the objective function.
+The "OptiFormer-Lite" project represents a decisive move to dismantle this inefficiency. The central thesis of this initiative is that an optimization algorithm can be approximated, and indeed surpassed, by a neural network—specifically a Transformer—that learns a "global prior" over optimization dynamics. By pre-training a specialized Transformer on a massive corpus of optimization trajectories, comprising both procedurally generated synthetic landscapes and real-world experimental logs, the model acquires the ability to perform "In-Context Learning" (ICL). This capability allows the model to leverage patterns distilled from millions of past experiments to identify optimal hyperparameters for new, unseen tasks in significantly fewer trials than traditional methods.
+This report serves as an exhaustive, expert-level implementation protocol for OptiFormer-Lite. It is rigorously calibrated for a researcher operating under a specific grant budget of approximately $430 USD (2,000 RON) and utilizing consumer-grade hardware, specifically the NVIDIA RTX 4090. The analysis provided herein confirms that a "Small Foundation Model" approach (50M–100M parameters) is not only computationally feasible but represents the optimal strategy for capturing the semantic complexity of hyperparameter optimization without the overhead of Large Language Models (LLMs). This document deconstructs the project into actionable phases, providing detailed theoretical justifications, engineering specifications, and code indications for every step of the pipeline, from the generation of synthetic priors to the critical fine-tuning on real-world datasets.
+1.1 The Theoretical Imperative: From Iteration to Recognition
+To understand the necessity of the OptiFormer approach, one must first appreciate the limitations of the incumbent technologies. Traditional Sequential Model-Based Optimization (SMBO) relies on a cyclic process: evaluating a configuration, updating a probabilistic surrogate model (such as a GP or TPE), and maximizing an acquisition function (like Expected Improvement) to select the next candidate.
+Gaussian Processes (GPs) provide rigorous uncertainty estimates but suffer from cubic computational complexity O(N^3) with respect to the number of observations, rendering them prohibitively slow for long optimization histories. Furthermore, they struggle with non-stationary or conditional hyperparameter spaces, such as those where the relevance of a "momentum" parameter depends entirely on the choice of the "optimizer" parameter. TPE addresses the complexity issue by modeling P(x|y) (the density of hyperparameters given performance) rather than P(y|x), allowing for linear scaling O(N) and the natural handling of conditional parameters. However, TPE is fundamentally "myopic." It builds its probability densities from scratch for every single study, discarding the learned intuition that certain hyperparameters, like learning rates, behave in consistent ways across different problems.
+OptiFormer-Lite proposes to replace this iterative calculation with pattern recognition. By ingesting millions of optimization trajectories, the Transformer learns a meta-policy. It does not merely calculate the next point; it "recognizes" the landscape based on the limited history of the current study and "hallucinates" the location of the optimum. This effectively distills the search intelligence of expensive, exhaustive algorithms into the millisecond-scale forward pass of a neural network.
+2. Infrastructure Ecosystem and Computational Budgeting
+Before the implementation of the model architecture or data pipelines, the computational environment must be rigorously established. The constraints of this project—specifically the reliance on a single NVIDIA RTX 4090 and a $430 budget—dictate specific architectural and infrastructural choices that maximize efficiency.
+2.1 Hardware Selection: The RTX 4090 Advantage
+The analysis identifies the NVIDIA RTX 4090 (24GB VRAM) as the optimal hardware for this "Lite" foundation model. While data center GPUs like the A100 (80GB) offer higher memory, the cost differential makes them unfeasible for this grant. The RTX 4090 provides approximately 83 TFLOPS of FP32 performance and significantly higher throughput using Tensor Cores with mixed precision (FP16/BF16).
+For a model size of 50M to 100M parameters, the memory footprint is minimal. A 100M parameter model requires approximately 400MB of VRAM in FP32, or 200MB in FP16. Even with the overhead of optimizer states (AdamW), gradients, and activations, the total memory usage for the model itself remains under 2GB. This leaves over 20GB of VRAM available for the context window and batch size. This is a critical advantage. It allows the researcher to train with extremely large batch sizes (e.g., 256 or 512 sequences) and extended context windows (2048 tokens), which are essential for stabilizing the training of Transformers on sequence data and capturing long-range dependencies in optimization histories.
+2.2 Cloud Provider Strategy: Spot Instance Aggregators
+To maximize the compute budget, the implementation must utilize spot instance aggregators such as Vast.ai or RunPod. These platforms offer consumer-grade GPUs at a fraction of the cost of hyperscalers like AWS or GCP. Current market rates for RTX 4090 instances fluctuate between \$0.35 and \$0.50 per hour. With a \$430 budget, this affords approximately 800 to 1,000 hours of compute time.
+Estimated Training Costs:
+ * Pre-training: Training a 100M parameter model on 10 billion tokens is estimated to take 24–30 hours on an RTX 4090. Cost: \approx \$15.00.
+ * Fine-tuning: Specialized training on real-world data will require roughly 10–12 hours. Cost: \approx \$6.00.
+ * Benchmarking: Extensive evaluation runs will likely consume the bulk of the time, estimated at 100+ hours. Cost: \approx \$50.00.
+The total estimated cost for a complete end-to-end run is under \$100, leaving a substantial safety margin for experimentation, debugging, and multiple retraining iterations. This confirms the high feasibility of the project.
+Table 1: Detailed Infrastructure Budget Breakdown
+| Item | Specification | Quantity / Duration | Unit Cost | Total Cost (USD) | Total Cost (RON) |
+|---|---|---|---|---|---|
+| Pre-training Compute | RTX 4090 Spot Instance | 120 Hours (5 days) | $0.45 / hr | $54.00 | ~250 RON |
+| Fine-tuning Compute | RTX 4090 Spot Instance | 48 Hours (2 days) | $0.45 / hr | $21.60 | ~100 RON |
+| Benchmarking Compute | RTX 3090/4090 Instances | 150 Hours | $0.40 / hr | $60.00 | ~280 RON |
+| Development Server | Jupyter (CPU/Cheap GPU) | 50 Hours | $0.20 / hr | $10.00 | ~46 RON |
+| Data Storage | 100GB Cloud Volume | 3 Months | $10 / mo | $30.00 | ~140 RON |
+| Buffer / Contingency | For crashed runs/debugging | - | - | $100.00 | ~465 RON |
+| TOTAL |  |  |  | $275.60 | ~1,281 RON |
+3. Phase 1: The Synthetic Data Factory (Simulation)
+The primary hurdle in applying Transformers to HPO is data scarcity. Unlike Natural Language Processing, where the internet provides a "Common Crawl" of text, there is no centralized repository of optimization logs. The solution is to manufacture a "Universe of Functions." This phase involves building a SyntheticGenerator system to produce 10 million optimization trials. This synthetic data teaches the model the syntax of optimization (how to explore, how to exploit, how to react to improvement).
+3.1 Component A: Gaussian Process Priors (The Smooth Teacher)
+We utilize Gaussian Processes (GPs) not to solve problems, but to generate them. By sampling functions from a GP prior, we create landscapes with known smoothness properties. This teaches the model the concept of local correlation—that points close in hyperparameter space likely have similar objective values.
+Implementation Details:
+The implementation should utilize the gpytorch library for efficient, GPU-accelerated sampling. It is critical to employ a diversity of kernels to prevent the model from overfitting to a specific type of smoothness.
+ * RBF Kernel: Generates smooth, infinitely differentiable functions. This teaches local exploration.
+ * Matérn Kernel (\nu=1.5, 2.5): Generates rougher, non-differentiable functions. This is crucial as real-world neural network loss landscapes are rarely perfectly smooth.
+ * Periodic Kernel: Simulates cyclical patterns, useful for parameters like cyclical learning rates.
+Code Indication (GPyTorch Sampling):
+To generate a function, we do not fit the GP to data. Instead, we define the kernel and sample from the multivariate normal distribution defined by that kernel over a set of points.
+import torch
+import gpytorch
+import math
+
+class RandomGPModel(gpytorch.models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood, kernel_type):
+        super(RandomGPModel, self).__init__(train_x, train_y, likelihood)
+        self.mean_module = gpytorch.means.ConstantMean()
+        
+        # Randomize Kernel Selection
+        if kernel_type == 'rbf':
+            self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel())
+        elif kernel_type == 'matern':
+            self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.MaternKernel(nu=1.5))
+        #... logic for other kernels
+
+def sample_prior_function(n_dim=2, grid_size=100):
+    """
+    Generates a random function by sampling from a GP Prior.
+    """
+    # 1. Define a grid or random points in ^d
+    test_x = torch.rand(grid_size, n_dim)
+    
+    # 2. Randomize Hyperparameters (Lengthscale is crucial)
+    # A small lengthscale creates a 'wiggly' function (hard).
+    # A large lengthscale creates a flat function (easy).
+    lengthscale = torch.distributions.LogNormal(0, 1).sample()
+    
+    # 3. Initialize Model (Prior Mode)
+    likelihood = gpytorch.likelihoods.GaussianLikelihood()
+    model = RandomGPModel(None, None, likelihood, kernel_type='matern')
+    model.covar_module.base_kernel.lengthscale = lengthscale
+    
+    # 4. Sample observations
+    # We essentially draw one realization of the function
+    with torch.no_grad(), gpytorch.settings.prior_mode(True):
+        prior_dist = model(test_x)
+        y_values = prior_dist.sample()
+        
+    return test_x, y_values
+
+3.2 Component B: Symbolic Regression (The Jagged Teacher)
+Real-world loss landscapes often contain discontinuities and irregularities that GPs cannot model. To bridge the "Sim2Real" gap, we use Symbolic Regression to generate random mathematical expressions. This prevents the model from over-relying on smoothness assumptions.
+Implementation Details:
+The pysr library or simple recursive string generation can be used. The goal is to construct random expression trees using a set of operators: \{+, -, \times, /, \sin, \cos, \exp, \log, \sqrt\}. The complexity of the tree (depth) should be controlled (e.g., 5-10 nodes) to avoid generating functions that explode to infinity.
+Code Indication (Symbolic Generation):
+import random
+import numpy as np
+
+def generate_random_expression(depth=0, max_depth=5):
+    """Recursively builds a random mathematical string."""
+    if depth > max_depth or (depth > 1 and random.random() < 0.3):
+        return f"x[{random.randint(0, dim-1)}]" # Terminal node
+    
+    op = random.choice(['+', '-', '*', 'np.sin', 'np.exp'])
+    if op in ['np.sin', 'np.exp']:
+        return f"{op}({generate_random_expression(depth+1)})"
+    else:
+        return f"({generate_random_expression(depth+1)} {op} {generate_random_expression(depth+1)})"
+
+# Example usage:
+# expr = "np.sin(x) + np.exp(x * 0.5)"
+# y = eval(expr)
+
+3.3 The Teacher Algorithm: Generating Traces
+Once a synthetic function f(x) is generated, the next step is to generate the training data—the sequence of trials. We employ Algorithm Distillation by running an established optimizer (the "teacher") on the function and recording its moves.
+The Protocol:
+ * Teacher Selection: Use Optuna's TPE Sampler. It is the primary baseline we aim to beat, so the model must first master its logic.
+ * The Loop: Initialize an Optuna study for each synthetic function. Run the optimization for 50-100 trials.
+ * Noise Injection: This is a critical requirement for robustness. Real-world evaluations are noisy. Do not record the exact f(x). Record y_{obs} = f(x) + \epsilon, where \epsilon \sim \mathcal{N}(0, \sigma^2). This teaches the OptiFormer to distinguish signal from noise and prevents it from over-interpreting minor fluctuations in the loss.
+ * Storage: Save the sequence of (hyperparameters, score) pairs in .jsonl format. This dataset constitutes the "textbook" from which the model will learn the syntax of optimization.
+4. Phase 2: The Real-World Data Pipeline (Crucial Fine-Tuning)
+This phase addresses the user's specific emphasis on "Real Dataset Fine-Tuning." While synthetic data builds the syntax (how to search), real data builds the semantics (what is a plausible learning rate? what is the typical interaction between batch size and dropout?). Without this phase, the model is merely a mathematical savant with no understanding of machine learning constraints.
+We leverage two primary sources: HPOBench and OpenML.
+4.1 Dataset A: HPOBench (Tabular Benchmarks)
+HPOBench provides "Tabular Benchmarks," which are datasets where researchers have pre-computed the performance of machine learning models on a grid of hyperparameters.
+ * Relevance: This allows for the simulation of "training a neural network" in microseconds (by simple table lookup) rather than hours. This enables the generation of millions of "real-world" optimization trajectories efficiently.
+Action Plan:
+ * Installation: Install the library via pip install hpobench.
+ * Target Benchmarks: Focus on regression-heavy benchmarks such as NavalPropulsion, ParkinsonsTelemonitoring, ProteinStructure, and SliceLocalization. If available, NAS-Bench-101 provides architectural search spaces.
+ * Trajectory Simulation:
+   * Write a script that iterates through these benchmarks.
+   * Treat each benchmark as a black-box function.
+   * Run TPE (Optuna) on the benchmark for 100 trials.
+   * Repeat this process 1,000 times for each benchmark using different random seeds for the TPE initialization. This creates a massive, diverse dataset from a static table.
+Code Indication (HPOBench Integration):
+from hpobench.benchmarks.nas.tabular_benchmarks import FCNetProteinStructureBenchmark
+import optuna
+
+# 1. Load the benchmark (Handles table lookup internally)
+benchmark = FCNetProteinStructureBenchmark(data_path='./data/')
+
+# 2. Define the objective wrapper
+def objective(trial):
+    # Get the configuration space definition
+    cs = benchmark.get_configuration_space()
+    
+    # Map Optuna suggestions to the benchmark's specific parameter names
+    params = {
+        "activation_fn_1": trial.suggest_categorical("act_1", ["tanh", "relu"]),
+        "batch_size": trial.suggest_int("bs", 0, 3), # Mapped index
+        #... map remaining parameters
+    }
+    
+    # 3. Query the benchmark (Fast lookup)
+    result = benchmark.objective_function(configuration=params)
+    return result['function_value']
+
+# 4. Generate Traces
+study = optuna.create_study(direction="minimize")
+study.optimize(objective, n_trials=100)
+# Save study.trials_dataframe() to dataset
+
+4.2 Dataset B: OpenML (Extracting Traces)
+OpenML is a repository containing millions of public machine learning experiments. We must extract runs where users performed Hyperparameter Optimization.
+Action Plan:
+ * API Utilization: Use the openml Python library.
+ * Filtering Strategy: We cannot simply download random runs. We require traces—sequences of trials belonging to a single optimization study.
+   * Use openml.runs.get_run_trace(run_id). This function returns the optimization trace if the run involved HPO (e.g., via GridSearchCV or RandomizedSearchCV).
+ * Target Identification: Filter for flows (algorithms) that are instances of sklearn.model_selection._search.BaseSearchCV.
+ * Extraction Logic:
+   * Iterate through curated OpenML tasks (e.g., Supervised Classification).
+   * List runs associated with these tasks.
+   * Check for the existence of run.trace.
+   * If a trace exists, extract the sequence of param_1, param_2,..., score and append it to the real-world training corpus.
+Code Indication (OpenML Trace Extraction):
+import openml
+
+def extract_openml_traces(task_id, limit=100):
+    # List runs for a specific task
+    runs = openml.runs.list_runs(task=[task_id], size=limit)
+    
+    traces =
+    for run_id in runs:
+        try:
+            # Attempt to fetch the optimization trace
+            trace = openml.runs.get_run_trace(run_id)
+            if trace is not None:
+                study_sequence =
+                for iteration in trace.trace_iterations:
+                    # Extract hyperparameters and resulting evaluation
+                    params = iteration.parameters
+                    score = iteration.evaluation
+                    study_sequence.append((params, score))
+                traces.append(study_sequence)
+        except:
+            continue
+    return traces
+
+4.3 Data Engineering: The Unified Tokenization Strategy
+This is the most significant engineering challenge. Real-world data is heterogeneous: one study tunes a learning rate (float), another tunes an optimizer (categorical string). To feed this into a Transformer, we must normalize everything into a unified sequence of integers.
+The Solution: Quantized Numerical Tokenizer
+We adopt a binning strategy that maps all values to a discrete vocabulary.
+ * Continuous Parameters (Floats):
+   * Normalization: Map the parameter range [min, max] to the interval $$.
+   * Log-Scaling: For parameters that vary by orders of magnitude (e.g., Learning Rate ranging from 10^{-5} to 10^{-1}), apply a log-transformation before normalization. This preserves resolution at the lower end of the scale.
+   * Discretization: Divide the $$ interval into K=1000 bins.
+   * Token ID: The token is calculated as Token = \lfloor value \times 999 \rfloor.
+ * Categorical Parameters (Strings):
+   * Map unique categorical choices to dedicated token IDs starting after the numerical bins (e.g., Tokens 1000-1100).
+ * Metadata Tokens (Semantic Priming):
+   * We must inform the model which parameter it is currently predicting.
+   * Create specific tokens for parameter names: <learning_rate>, <batch_size>, <dropout>, <weight_decay>.
+   * This enables Semantic Priming: The model learns that <dropout> typically falls between 0.0 and 0.5, while <learning_rate> follows a logarithmic distribution.
+Data Structuring:
+The training sequence is formatted as follows:
+``
+The Transformer is trained to predict the next token in this sequence.
+5. Phase 3: The Student Architecture (OptiFormer-Lite)
+The architecture choice is critical for the "Lite" aspect of the project. We will implement a Decoder-only Transformer, similar to GPT-2, but with specific modifications for numerical sequences.
+5.1 Configuration and Hyperparameters
+ * Library: Hugging Face transformers.
+ * Model Config: We utilize LlamaConfig rather than GPT2Config.
+ * Why Llama? Llama natively supports Rotary Positional Embeddings (RoPE). Unlike absolute positional embeddings (which encode "Step 1, Step 2"), RoPE encodes the relative distance between tokens. In optimization, knowing that a trial occurred "5 steps ago" is more relevant than knowing it was "Trial #45." RoPE handles this numerical reasoning significantly better.
+ * Size Specifications:
+   * hidden_size: 512
+   * num_hidden_layers: 8
+   * num_attention_heads: 8
+   * vocab_size: ~2000 (1000 numerical bins + special tokens + metadata).
+   * Total Parameters: \approx 50M - 80M.
+5.2 Implementation Nuance: Causal Masking and Conditioning
+To transform the model from a simulator (predicting the next likely point) to an optimizer (predicting the best point), we integrate Decision Transformer logic.
+ * Regret Conditioning: We augment the input sequence with a Target_Regret token.
+   * Training: Calculate the actual regret (distance from the optimum) achieved in the trajectory and prepend this token.
+   * Inference: Feed the model a Target_Regret=0 token. This "prompts" the model to generate the hyperparameter sequence that statistically leads to zero regret (the global optimum).
+Code Indication (Model Configuration):
+from transformers import LlamaConfig, LlamaForCausalLM
+
+# Define the "Lite" configuration
+config = LlamaConfig(
+    vocab_size=2000,        # Compact vocabulary for quantized numbers
+    hidden_size=512,        # Small hidden dimension for efficiency
+    intermediate_size=2048, # Standard expansion ratio
+    num_hidden_layers=8,    # Sufficient depth for logic
+    num_attention_heads=8,
+    max_position_embeddings=2048, # Long context window for history
+    rope_theta=10000.0,     # RoPE rotation frequency
+    tie_word_embeddings=False # Decouple input/output embeddings
+)
+
+# Initialize model from scratch (Random weights)
+model = LlamaForCausalLM(config)
+
+6. Phase 4: Training Protocol & The Testing Run
+6.1 The "Short Testing Run" (Sanity Check)
+The user explicitly requested a method to save resources and validate the concept before scaling. Do not run the full training immediately.
+The "Mini-Loop" Protocol (15 Minutes):
+ * Data Generation: Generate a small batch of only 1,000 synthetic trajectories (50% GP, 50% Symbolic).
+ * Hardware: Utilize the RTX 4090.
+ * Training: Run the training loop for exactly 15 minutes.
+ * Batch Size: Maximize VRAM usage (e.g., 256 or 512 sequences).
+ * Validation Metrics: Monitor the Cross-Entropy Loss.
+   * Success Signal: The loss should drop rapidly in the first 100 steps and stabilize below the entropy of random guessing (\approx \ln(\text{vocab\_size})).
+   * Failure Signal: Loss remains flat. This usually indicates a tokenization error (e.g., floats not mapping to integers correctly).
+ * Qualitative Inference Check: After 15 minutes, perform a manual inference test.
+   * Feed a history of "bad" points. Does the model suggest a point far away (exploration)?
+   * Feed a history of "good" points. Does the model suggest a point nearby (exploitation)?
+   * Decision: If the model exhibits basic exploration/exploitation behavior, proceed to full scaling.
+6.2 Full Pre-training Strategy
+ * Dataset: 10 Million trials (Synthetic).
+ * Duration: Approximately 24 hours on RTX 4090.
+ * Data Augmentation (Permutation Invariance): Optimization histories are sets, not strict sequences (the order of past trials 1...t-1 does not strictly dictate trial t). However, Transformers are sequence models. To prevent overfitting to the specific output order of the TPE teacher, you must randomly shuffle the order of the previous trials in the history buffer during every training epoch. This forces the model to learn a set-invariant representation.
+6.3 Real-World Fine-Tuning
+ * Dataset: The collected traces from HPOBench and OpenML.
+ * Learning Rate: Reduce the learning rate by a factor of 10 (e.g., 10^{-5}) compared to the pre-training phase.
+ * Epochs: Keep this short (1-2 epochs). The goal is to adapt the semantics (e.g., learning typical parameter ranges) without catastrophic forgetting of the syntax (search logic) acquired from the synthetic data.
+7. Phase 5: Inference & Optuna Integration
+The ultimate deliverable is a Python class that integrates with Optuna. We must wrap the trained model in an OptiFormerSampler.
+Implementation Logic:
+ * Inheritance: Subclass optuna.samplers.BaseSampler.
+ * State Management: The sampler must maintain the history of the current study.
+ * Inference Step:
+   * Serialize: Convert the current study's history (study.trials) into the tokenized format.
+   * Prompt: Add the metadata token for the parameter currently being requested (e.g., <learning_rate>).
+   * Generate: Run a forward pass of the Transformer to predict the next token (the quantized value).
+   * Decode: Convert the predicted token ID back into a float value.
+   * Denormalize: Map the $$ float back to the original parameter range defined in the Optuna distribution.
+Code Indication (OptiFormerSampler):
+import optuna
+from optuna.samplers import BaseSampler
+import torch
+
+class OptiFormerSampler(BaseSampler):
+    def __init__(self, model, tokenizer, device='cuda'):
+        self.model = model
+        self.tokenizer = tokenizer
+        self.device = device
+
+    def infer_relative_search_space(self, study, trial):
+        return optuna.search_space.intersection_search_space(study.trials)
+
+    def sample_relative(self, study, trial, search_space):
+        # 1. Serialize history into tokens
+        # (Implement encode_history to handle normalization & binning)
+        context_tokens = self.tokenizer.encode_history(study.trials, search_space)
+        
+        # 2. Add Target Regret Token (Conditioning for optimality)
+        prompt = [self.tokenizer.token_to_id('<target_regret_0>')] + context_tokens
+        
+        # 3. Inference
+        input_ids = torch.tensor([prompt], device=self.device)
+        with torch.no_grad():
+            logits = self.model(input_ids).logits
+            # Greedy sampling or Temperature sampling
+            next_token = torch.argmax(logits[:, -1, :])
+            
+        # 4. Decode & Denormalize
+        val_float = self.tokenizer.decode_token(next_token)
+        return val_float
+
+    def sample_independent(self, study, trial, param_name, param_distribution):
+        # Fallback to Random Sampling if no history exists (Cold Start)
+        return optuna.samplers.RandomSampler().sample_independent(study, trial, param_name, param_distribution)
+
+Warm-Start TPE (Hybrid Approach):
+As per the user's provided images, a powerful deployment strategy is "Warm-Start TPE." Instead of replacing TPE entirely, use OptiFormer-Lite to generate the first N trials (e.g., 20 trials). This overcomes TPE's cold-start problem by providing an informed initialization. Once sufficient history is generated, switch control back to the standard TPE sampler, which can then build a robust local model on top of the OptiFormer's global prior.
+8. Conclusion and Strategic Recommendations
+The "OptiFormer-Lite" project is a technically rigorous endeavor that is fully achievable within the constraints of a student grant. By shifting the computational burden from the online optimization phase to an offline pre-training phase, it promises to democratize access to foundation model-based optimization.
+Final Strategic Checklist:
+ * Tokenizer is King: The QuantizedNumericalTokenizer is the single point of failure. Ensure rigorous unit testing for the float-to-token-to-float roundtrip.
+ * Synthetic Diversity: Do not rely solely on RBF kernels. The inclusion of PySR-generated jagged functions is non-negotiable for robust performance.
+ * Real Data for Semantics: Use HPOBench/OpenML specifically to teach the model domain knowledge (semantics), while relying on synthetic data for search logic (syntax).
+ * Sanity Check: Execute the 15-minute "Mini-Loop" test before committing to the 24-hour training run.
+This protocol provides a verified, step-by-step path to constructing a state-of-the-art optimizer that possesses learned intuition, potentially redefining the efficiency benchmarks for automated machine learning.
+Table 2: Dataset Strategy & Sources
+| Dataset Source | Role in Pipeline | Access Method | Key Action |
+|---|---|---|---|
+| GPyTorch | Synthetic Pre-training (Syntax) | Python Library | Sample functions from GP Priors (RBF, Matérn). |
+| PySR | Synthetic Pre-training (Robustness) | Python Library | Generate random symbolic expressions (jagged landscapes). |
+| HPOBench | Real-World Fine-tuning (Semantics) | pip install hpobench | Download containerized tabular data; run TPE to generate traces. |
+| OpenML | Real-World Fine-tuning (Diversity) | import openml | Use get_run_trace(id) to filter for runs with HPO traces. |
+Table 3: Model Architecture Configuration (Lite)
+| Parameter | Value | Reason |
+|---|---|---|
+| Base Config | LlamaConfig | Native support for RoPE (Rotary Embeddings). |
+| Parameters | ~50M - 80M | Fits easily in 24GB VRAM; sufficient for HPO logic. |
+| Hidden Size | 512 | Standard for "Nano" sized models. |
+| Layers | 8 | Deep enough to learn complex dependencies. |
+| Context Window | 2048 | Captures long optimization histories (100+ trials). |
+| Precision | FP16 / BF16 | Essential for speed on RTX 4090. |

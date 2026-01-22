@@ -1,0 +1,210 @@
+# OptiFormer Base Configuration (Production)
+# ===========================================
+# This configuration is optimized for production-quality training.
+# Use smoke_test.yaml for quick validation, this config for full training.
+
+project:
+  name: "optiformer"
+  seed: 42
+  device: "cuda"
+  output_dir: "./outputs"
+
+# =============================================================================
+# TOKENIZER CONFIGURATION
+# =============================================================================
+tokenizer:
+  num_bins: 1000              # 0.1% resolution for continuous parameters
+  max_categorical: 100        # Max categories per categorical parameter
+  special_tokens:
+    pad: 0
+    bos: 1
+    eos: 2
+    trial_sep: 3
+    score: 4
+    target_regret_0: 5        # Optimal (best 10%)
+    target_regret_1: 6        # Good (10-30%)
+    target_regret_2: 7        # Acceptable (30-50%)
+  param_token_start: 1100
+
+# =============================================================================
+# DATA CONFIGURATION
+# =============================================================================
+# CRITICAL: Production models MUST use real-world data for generalization.
+# Recommended: 70% real-world, 30% synthetic
+data:
+  # Data composition - 30% synthetic, 70% real-world
+  synthetic_weight: 0.30
+
+  # Require real-world data or simulated fallback
+  require_real_world: false
+  use_simulated_fallback: true
+  min_real_world_trajectories: 2000
+
+  synthetic:
+    gp_functions: 3000        # GP-sampled smooth functions
+    symbolic_functions: 2000  # Random symbolic expressions
+
+    # Cover a wide range of dimensions
+    dimensions: [2, 3, 5, 8, 10, 15, 20]
+
+    # Varied trajectory lengths for robustness
+    trials_per_function: [32, 48, 64, 96]
+
+    # Varied noise levels
+    noise_std: [0.01, 0.02, 0.05, 0.08]
+
+    gp_config:
+      kernels: ["rbf", "matern_0.5", "matern_1.5", "matern_2.5"]
+      lengthscale_prior: "lognormal"
+      output_variance: [0.5, 1.0, 2.0]
+
+    symbolic_config:
+      operators: ["+", "-", "*", "/", "sin", "cos", "exp", "log", "sqrt", "abs"]
+      max_depth: 6
+
+  real_world:
+    # HPOBench - Neural network tabular benchmarks
+    use_hpobench: true
+    hpobench_benchmarks:
+      - "fcnet_protein"
+      - "fcnet_naval"
+      - "fcnet_slice"
+    hpobench_traces_per_benchmark: 500
+
+    # YAHPO Gym - Diverse ML algorithm benchmarks
+    use_yahpo: true
+    yahpo_scenarios:
+      - "lcbench"
+      - "rbv2_svm"
+      - "rbv2_xgboost"
+      - "rbv2_ranger"
+      - "rbv2_glmnet"
+    yahpo_traces_per_scenario: 400
+
+    # OpenML - Historical experiment traces
+    use_openml: true
+    openml_task_ids: [3, 12, 31, 53, 3917, 9981, 14965, 146820]
+    openml_configs_per_task: 150
+
+    # Simulated real-world as fallback
+    use_simulated_real_world: true
+    simulated_configs:
+      - name: "neural_network_classification"
+        n_trajectories: 500
+      - name: "xgboost_tuning"
+        n_trajectories: 400
+      - name: "random_forest_tuning"
+        n_trajectories: 300
+      - name: "transformer_finetuning"
+        n_trajectories: 300
+
+# =============================================================================
+# MODEL CONFIGURATION
+# =============================================================================
+model:
+  size: "base"                # Use "base" for production (~50M params)
+
+  small:
+    vocab_size: 1500
+    hidden_size: 384
+    intermediate_size: 1536
+    num_hidden_layers: 6
+    num_attention_heads: 6
+    max_position_embeddings: 1024
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~25M parameters
+
+  base:
+    vocab_size: 2000
+    hidden_size: 512
+    intermediate_size: 2048
+    num_hidden_layers: 8
+    num_attention_heads: 8
+    max_position_embeddings: 2048
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~50M parameters
+
+  large:
+    vocab_size: 2500
+    hidden_size: 768
+    intermediate_size: 3072
+    num_hidden_layers: 12
+    num_attention_heads: 12
+    max_position_embeddings: 4096
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~150M parameters
+
+# =============================================================================
+# TRAINING CONFIGURATION
+# =============================================================================
+training:
+  batch_size: 64
+  gradient_accumulation_steps: 4    # Effective batch size: 256
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+
+  max_steps: 50000                  # ~8-12 hours on A100
+  warmup_steps: 1000
+  lr_scheduler: "cosine"
+
+  fp16: false
+  bf16: true                        # Prefer BF16 if available (better stability)
+
+  logging_steps: 100
+  eval_steps: 2000
+  save_steps: 5000
+
+  early_stopping:
+    enabled: true
+    patience: 5
+    min_delta: 0.0005
+
+# =============================================================================
+# EVALUATION CONFIGURATION
+# =============================================================================
+evaluation:
+  synthetic_benchmarks:
+    dimensions_to_test: [2, 3, 5, 8, 10, 15]
+    num_trials: 100
+    num_seeds: 10
+
+  categorical_benchmarks:
+    enabled: true
+    n_trials: 50
+    n_seeds: 5
+
+  ml_benchmarks:
+    mnist_mlp:
+      enabled: true
+      epochs_per_trial: 10
+      num_trials: 50
+
+    cifar_cnn:
+      enabled: true
+      epochs_per_trial: 20
+      num_trials: 50
+
+    xgboost_classification:
+      enabled: true
+      num_trials: 50
+
+  baselines:
+    - "random"
+    - "tpe"
+    - "cmaes"
+
+# =============================================================================
+# SUCCESS THRESHOLDS
+# =============================================================================
+thresholds:
+  tokenizer_roundtrip_error: 0.001
+  min_loss_reduction: 0.6
+  vs_random_win_rate_synthetic: 0.7
+  vs_random_win_rate_ml: 0.55
+  vs_tpe_regret_ratio: 1.5
+  categorical_valid_rate: 0.98
+  edge_case_pass_rate: 0.9
