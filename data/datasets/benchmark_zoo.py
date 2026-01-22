@@ -167,6 +167,19 @@ class YAHPOLoader:
                 fidelity_name = bench.config_space.get_hyperparameter_names()[-1]  # Usually last
                 config[fidelity_name] = fidelity
 
+            # Prune inactive hyperparameters
+            # We must remove parameters whose parent conditions are not met
+            # Run multiple passes to handle dependency chains
+            for _ in range(3):
+                for cond in config_space.get_conditions():
+                    child_name = cond.child.name
+                    if child_name in config:
+                        try:
+                            if not cond.evaluate(config):
+                                del config[child_name]
+                        except Exception:
+                            pass
+
             # Evaluate
             result = bench.objective_function(config)
 
