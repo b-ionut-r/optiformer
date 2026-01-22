@@ -230,7 +230,7 @@ class OptiFormer(nn.Module):
         Returns:
             Loaded OptiFormer model
         """
-        checkpoint = torch.load(path, map_location=device)
+        checkpoint = torch.load(path, map_location=device, weights_only=False)
         config = OptiFormerConfig.from_dict(checkpoint['config'])
         model = cls(config)
         model.model.load_state_dict(checkpoint['model_state_dict'])

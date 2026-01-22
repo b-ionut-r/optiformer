@@ -7,7 +7,7 @@ Main training implementation with logging, checkpointing, and early stopping.
 import torch
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 from transformers import get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup
 from tqdm import tqdm
 from pathlib import Path
@@ -186,7 +186,7 @@ class OptiFormerTrainer:
 
         # Mixed precision
         self.use_amp = config.fp16 or config.bf16
-        self.scaler = GradScaler() if config.fp16 else None
+        self.scaler = GradScaler('cuda') if config.fp16 else None
         self.amp_dtype = torch.bfloat16 if config.bf16 else torch.float16
 
         # Early stopping
@@ -231,7 +231,7 @@ class OptiFormerTrainer:
 
             # Forward pass with mixed precision
             if self.use_amp:
-                with autocast(dtype=self.amp_dtype):
+                with autocast('cuda', dtype=self.amp_dtype):
                     outputs = self.model(
                         input_ids=batch['input_ids'],
                         attention_mask=batch['attention_mask'],
@@ -365,7 +365,7 @@ class OptiFormerTrainer:
             batch = {k: v.to(self.device) for k, v in batch.items()}
 
             if self.use_amp:
-                with autocast(dtype=self.amp_dtype):
+                with autocast('cuda', dtype=self.amp_dtype):
                     outputs = self.model(
                         input_ids=batch['input_ids'],
                         attention_mask=batch['attention_mask'],

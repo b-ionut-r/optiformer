@@ -15,7 +15,7 @@ from optuna.distributions import (
 from optuna.study import Study
 from optuna.trial import FrozenTrial, TrialState
 import torch
-from torch.cuda.amp import autocast
+from torch.amp import autocast
 import numpy as np
 from typing import Dict, Any, Optional, Sequence, List
 
@@ -186,7 +186,7 @@ class OptiFormerSampler(BaseSampler):
 
         # Get probability distribution over next token with optional AMP
         if self.use_amp:
-            with autocast(dtype=torch.float16):
+            with autocast('cuda', dtype=torch.float16):
                 probs = self.model.get_token_probabilities(input_ids)
         else:
             probs = self.model.get_token_probabilities(input_ids)
