@@ -22,6 +22,50 @@ from data.generators import (
 )
 
 
+def generate_yahpo_trajectories(output_path: Path, seed: int = 42) -> int:
+    """Generate trajectories from YAHPO-Gym benchmarks (60% of total data)."""
+    try:
+        from data.datasets.benchmark_zoo import YAHPOLoader
+        
+        # Check if YAHPO is available
+        try:
+            import yahpo_gym
+        except ImportError:
+            print("  WARNING: YAHPO Gym not installed. Skipping YAHPO data generation.")
+            print("  Install with: pip install yahpo-gym")
+            return 0
+
+        print(f"  Generating YAHPO trajectories...")
+        loader = YAHPOLoader()
+        total = 0
+
+        # Generate 3000 total YAHPO trajectories across 4 scenarios
+        scenarios = [
+            ('lcbench', 1000),      # Learning curves, 7 params
+            ('rbv2_xgboost', 1000), # XGBoost tuning, 14 params
+            ('rbv2_svm', 500),      # SVM tuning, 6 params
+            ('rbv2_ranger', 500),   # Random forest, 8 params
+        ]
+
+        for scenario, n_traj in scenarios:
+            try:
+                print(f"    Generating {n_traj} trajectories for {scenario}...")
+                trajectories = loader.generate_trajectories(
+                    scenario=scenario,
+                    n_trajectories=n_traj,
+                    n_trials=32,
+                    output_path=output_path
+                )
+                total += len(trajectories)
+            except Exception as e:
+                print(f"    WARNING: Failed to generate {scenario}: {e}")
+
+        return total
+    except Exception as e:
+        print(f"  WARNING: YAHPO generation failed: {e}")
+        return 0
+
+
 def generate_smoke_test_data(
     output_dir: Path,
     n_gp_functions: int = 500,
@@ -29,6 +73,7 @@ def generate_smoke_test_data(
     trials_per_function: int = 32,
     dims_list: list = None,
     seed: int = 42,
+    comprehensive: bool = False,
 ) -> Tuple[bool, Dict[str, Any]]:
     """
     Generate synthetic data for smoke testing.
@@ -40,6 +85,7 @@ def generate_smoke_test_data(
         trials_per_function: Trials per trajectory
         dims_list: List of dimensions to use
         seed: Random seed
+        comprehensive: Whether to include YAHPO data
 
     Returns:
         (success, results_dict)
@@ -54,11 +100,18 @@ def generate_smoke_test_data(
     results = {
         'gp_functions': 0,
         'symbolic_functions': 0,
+        'yahpo_trajectories': 0,
         'n_trajectories': 0,
         'errors': [],
     }
 
     np.random.seed(seed)
+
+    if comprehensive:
+        # Comprehensive mode: 40% synthetic (2000 total)
+        n_gp_functions = 1000
+        n_symbolic_functions = 1000
+        print(f"  Comprehensive mode: Using {n_gp_functions} GP + {n_symbolic_functions} Symbolic functions")
 
     try:
         # Generate GP functions
@@ -126,6 +179,13 @@ def generate_smoke_test_data(
 
         print(f"    Total trajectories: {results['n_trajectories']}")
         print(f"    Train: {n_train}, Val: {n_val}")
+
+        # Generate YAHPO data if comprehensive
+        if comprehensive:
+            n_yahpo = generate_yahpo_trajectories(train_path, seed=seed)
+            results['yahpo_trajectories'] = n_yahpo
+            results['n_trajectories'] += n_yahpo
+            print(f"    Added {n_yahpo} YAHPO trajectories")
 
         # Verify data
         print("  Verifying generated data...")

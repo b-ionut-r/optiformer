@@ -49,6 +49,7 @@ def run_smoke_test(
     skip_training: bool = False,
     skip_realworld: bool = False,
     quick: bool = False,
+    comprehensive: bool = False,
 ) -> dict:
     """
     Run the complete smoke test pipeline.
@@ -58,6 +59,7 @@ def run_smoke_test(
         skip_training: If True, skip training and use existing model
         skip_realworld: If True, skip real-world ML evaluation
         quick: If True, use minimal settings for speed
+        comprehensive: If True, use larger dataset and longer training
 
     Returns:
         Results dictionary
@@ -71,7 +73,7 @@ def run_smoke_test(
         'passed': True,
     }
 
-    # Configuration based on quick mode
+    # Configuration based on mode
     if quick:
         n_gp_functions = 100
         n_symbolic_functions = 100
@@ -79,7 +81,16 @@ def run_smoke_test(
         max_steps = 500
         n_trials_eval = 15
         n_seeds = 2
+    elif comprehensive:
+        # Comprehensive mode: 40% synthetic (2000 total) + 60% YAHPO
+        n_gp_functions = 1000
+        n_symbolic_functions = 1000
+        trials_per_function = 32
+        max_steps = 5000
+        n_trials_eval = 50
+        n_seeds = 3
     else:
+        # Default mode
         n_gp_functions = 500
         n_symbolic_functions = 500
         trials_per_function = 32
@@ -114,6 +125,7 @@ def run_smoke_test(
             n_gp_functions=n_gp_functions,
             n_symbolic_functions=n_symbolic_functions,
             trials_per_function=trials_per_function,
+            comprehensive=comprehensive,
         )
         results['phases']['data_generation'] = phase2_results
         if not phase2_pass:
@@ -400,6 +412,11 @@ def main():
         action="store_true",
         help="Use minimal settings for quick testing",
     )
+    parser.add_argument(
+        "--comprehensive",
+        action="store_true",
+        help="Use comprehensive training with 60% YAHPO + 40% synthetic (~1 hour)",
+    )
 
     args = parser.parse_args()
 
@@ -415,6 +432,7 @@ def main():
         skip_training=args.skip_training,
         skip_realworld=args.skip_realworld,
         quick=args.quick,
+        comprehensive=args.comprehensive,
     )
 
     elapsed = time.time() - start_time
