@@ -79,7 +79,7 @@ class OptiFormerSampler(BaseSampler):
         trial: optuna.Trial,
     ) -> Dict[str, BaseDistribution]:
         """Return the search space."""
-        return optuna.search_space.intersection_search_space(study)
+        return optuna.search_space.intersection_search_space(study.trials)
 
     def sample_relative(
         self,
@@ -309,7 +309,7 @@ class HybridSampler(BaseSampler):
         trial: optuna.Trial,
     ) -> Dict[str, BaseDistribution]:
         """Return the search space."""
-        return optuna.search_space.intersection_search_space(study)
+        return optuna.search_space.intersection_search_space(study.trials)
 
     def sample_relative(
         self,
