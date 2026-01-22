@@ -31,8 +31,8 @@ data:
   synthetic_weight: 0.3       # Only 30% synthetic for production
 
   synthetic:
-    gp_functions: 20000       # Reduced - synthetic is supplementary
-    symbolic_functions: 20000
+    gp_functions: 200000       # Large scale for production
+    symbolic_functions: 200000
     trials_per_function: 128
     dimensions: [5, 8, 10, 12, 15]  # Match real HPO dimensionality
     noise_std: 0.05           # Higher noise to match real training variance
@@ -52,7 +52,7 @@ data:
       - "fcnet_protein"
       - "fcnet_naval"
       - "fcnet_slice"
-    hpobench_traces_per_benchmark: 3000
+    hpobench_traces_per_benchmark: 10000
 
     # YAHPO Gym - MOST DIVERSE (LCBench, SVM, XGBoost, RandomForest, NAS)
     use_yahpo: true
@@ -61,7 +61,7 @@ data:
       - "rbv2_svm"          # SVM tuning on 103 datasets
       - "rbv2_xgboost"      # XGBoost tuning on 103 datasets
       - "rbv2_ranger"       # RandomForest tuning on 103 datasets
-    yahpo_traces_per_scenario: 2000
+    yahpo_traces_per_scenario: 10000
 
     # JAHS-Bench-201 - Architecture + Hyperparameter joint search
     use_jahs: true
@@ -69,7 +69,7 @@ data:
       - "cifar10"
       - "fashion_mnist"
       - "colorectal_histology"
-    jahs_traces_per_task: 1500
+    jahs_traces_per_task: 5000
 
     # OpenML - Historical experiment traces
     use_openml: true
@@ -78,7 +78,18 @@ data:
 
 # Model Configuration (Base for Full Training)
 model:
-  size: "base"
+  size: "small"
+
+  small:
+    vocab_size: 2000
+    hidden_size: 384
+    intermediate_size: 1536
+    num_hidden_layers: 12
+    num_attention_heads: 12
+    max_position_embeddings: 2048
+    rope_theta: 10000.0
+    dropout: 0.1
+    # ~25M parameters
 
   base:
     vocab_size: 2000
@@ -110,7 +121,7 @@ training:
   weight_decay: 0.01
   max_grad_norm: 1.0
 
-  max_steps: 50000
+  max_steps: 100000
   warmup_steps: 1000
   lr_scheduler: "cosine"
 
@@ -119,7 +130,7 @@ training:
 
   logging_steps: 100
   eval_steps: 2000
-  save_steps: 5000
+  save_steps: 10000
 
   early_stopping:
     enabled: true

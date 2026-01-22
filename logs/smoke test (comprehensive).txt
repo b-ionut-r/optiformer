@@ -1,0 +1,541 @@
+(main) root@C.30367056:/workspace/research/optiformer$ python -m smoke_test.run_all --comprehensive
+
+============================================================
+  OptiFormer-Lite Smoke Test
+  Started: 2026-01-22 21:47:56
+============================================================
+
+============================================================
+  PHASE 1: Tokenizer Validation
+============================================================
+
+
+Phase 1: Tokenizer Validation
+----------------------------------------
+  Testing numerical tokenizer...
+    Numerical tokenizer: PASS
+  Testing sequence tokenizer...
+    Sequence tokenizer: PASS
+Tokenizer tests passed
+
+============================================================
+  PHASE 2: Data Generation
+============================================================
+
+
+Phase 2: Data Generation
+----------------------------------------
+  Comprehensive mode: Using 1000 GP + 1000 Symbolic functions
+  Generating 1000 GP functions...
+
+^C    Generated 1000 GP functions
+  Generating 1000 symbolic functions...
+    Generated 1000 symbolic functions
+  Generating training trajectories (1800 functions)...
+Training trajectories: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1800/1800 [02:32<00:00, 11.82it/s]
+  Generating validation trajectories (200 functions)...
+Validation trajectories: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 200/200 [00:16<00:00, 12.34it/s]
+    Total trajectories: 2000
+    Train: 1800, Val: 200
+  Generating YAHPO trajectories...
+    Generating 1000 trajectories for lcbench...
+Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   0%|                                                                                                                                         | 0/1000 [00:00<?, ?it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   0%|▏                                                                                                                                | 1/1000 [00:00<09:24,  1.77it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   0%|▎                                                                                                                                | 2/1000 [00:00<07:26,  2.23it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   0%|▍                                                                                                                                | 3/1000 [00:01<07:10,  2.32it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   0%|▌                                                                                                                                | 4/1000 [00:01<06:45,  2.46it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   0%|▋                                                                                                                                | 5/1000 [00:02<06:11,  2.68it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|▊                                                                                                                                | 6/1000 [00:02<06:19,  2.62it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|▉                                                                                                                                | 7/1000 [00:02<06:16,  2.64it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|█                                                                                                                                | 8/1000 [00:03<05:54,  2.80it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|█▏                                                                                                                               | 9/1000 [00:03<05:41,  2.90it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|█▎                                                                                                                              | 10/1000 [00:03<05:42,  2.89it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|█▍                                                                                                                              | 11/1000 [00:04<05:44,  2.87it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|█▌                                                                                                                              | 12/1000 [00:04<05:33,  2.96it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|█▋                                                                                                                              | 13/1000 [00:04<05:39,  2.91it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   1%|█▊                                                                                                                              | 14/1000 [00:05<05:26,  3.02it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   2%|█▉                                                                                                                              | 15/1000 [00:05<05:24,  3.04it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   2%|██                                                                                                                              | 16/1000 [00:05<05:42,  2.87it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   2%|██▏                                                                                                                             | 17/1000 [00:06<05:38,  2.91it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   2%|██▎                                                                                                                             | 18/1000 [00:06<05:46,  2.84it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:   2%|██▍                                                                                                                             | 19/1000 [00:06<05:45,  2.84it/s]Please make sure to also cite:
+Zimmer, L., Lindauer, M., & Hutter, F. (2021). Auto-Pytorch: Multi-Fidelity Metalearning for Efficient and Robust AutoDL. IEEE Transactions on Pattern Analysis and Machine Intelligence, 43(9), 3079-3090.
+Zimmer, L. (2020). data_2k_lw.zip. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11662422.v1, Apache License, Version 2.0.
+YAHPO lcbench:  12%|███████████████▉                                                                                                               | 125/1000 [00:30<04:14,  3.44it/s]
+YAHPO lcbench: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [03:52<00:00,  4.31it/s]
+    Generating 1000 trajectories for rbv2_xgboost...
+Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   0%|                                                                                                                                    | 0/1000 [00:00<?, ?it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   0%|                                                                                                                            | 1/1000 [00:00<11:34,  1.44it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   0%|▏                                                                                                                           | 2/1000 [00:01<10:05,  1.65it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   0%|▎                                                                                                                           | 3/1000 [00:01<08:53,  1.87it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   0%|▍                                                                                                                           | 4/1000 [00:02<09:21,  1.77it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   0%|▌                                                                                                                           | 5/1000 [00:02<09:14,  1.79it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|▋                                                                                                                           | 6/1000 [00:03<08:34,  1.93it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|▊                                                                                                                           | 7/1000 [00:03<08:32,  1.94it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|▉                                                                                                                           | 8/1000 [00:04<08:42,  1.90it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|█                                                                                                                           | 9/1000 [00:04<08:24,  1.96it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|█▏                                                                                                                         | 10/1000 [00:05<08:21,  1.97it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|█▎                                                                                                                         | 11/1000 [00:05<08:29,  1.94it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|█▍                                                                                                                         | 12/1000 [00:06<08:21,  1.97it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|█▌                                                                                                                         | 13/1000 [00:06<08:00,  2.05it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   1%|█▋                                                                                                                         | 14/1000 [00:07<08:05,  2.03it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   2%|█▊                                                                                                                         | 15/1000 [00:07<08:22,  1.96it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   2%|█▉                                                                                                                         | 16/1000 [00:08<08:14,  1.99it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   2%|██                                                                                                                         | 17/1000 [00:08<08:27,  1.94it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   2%|██▏                                                                                                                        | 18/1000 [00:09<08:30,  1.92it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:   2%|██▎                                                                                                                        | 19/1000 [00:09<08:48,  1.86it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_xgboost:  18%|█████████████████████▉                                                                                                    | 180/1000 [01:16<06:04,  2.25it/s]
+YAHPO rbv2_xgboost: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [07:03<00:00,  2.36it/s]
+    Generating 500 trajectories for rbv2_svm...
+Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   0%|                                                                                                                                         | 0/500 [00:00<?, ?it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   0%|▎                                                                                                                                | 1/500 [00:00<05:29,  1.51it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   0%|▌                                                                                                                                | 2/500 [00:01<04:34,  1.81it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   1%|▊                                                                                                                                | 3/500 [00:01<04:10,  1.98it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   1%|█                                                                                                                                | 4/500 [00:02<04:09,  1.99it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   1%|█▎                                                                                                                               | 5/500 [00:02<03:56,  2.09it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   1%|█▌                                                                                                                               | 6/500 [00:02<03:51,  2.13it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   1%|█▊                                                                                                                               | 7/500 [00:03<03:45,  2.19it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   2%|██                                                                                                                               | 8/500 [00:03<03:47,  2.17it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   2%|██▎                                                                                                                              | 9/500 [00:04<03:41,  2.21it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   2%|██▌                                                                                                                             | 10/500 [00:04<03:48,  2.14it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   2%|██▊                                                                                                                             | 11/500 [00:05<03:54,  2.09it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   2%|███                                                                                                                             | 12/500 [00:05<03:52,  2.10it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   3%|███▎                                                                                                                            | 13/500 [00:06<03:56,  2.06it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   3%|███▌                                                                                                                            | 14/500 [00:06<03:55,  2.07it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   3%|███▊                                                                                                                            | 15/500 [00:07<03:49,  2.11it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   3%|████                                                                                                                            | 16/500 [00:07<03:56,  2.05it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   3%|████▎                                                                                                                           | 17/500 [00:08<03:52,  2.07it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   4%|████▌                                                                                                                           | 18/500 [00:08<03:50,  2.09it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm:   4%|████▊                                                                                                                           | 19/500 [00:09<03:48,  2.10it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_svm: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 500/500 [02:18<00:00,  3.62it/s]
+    Generating 500 trajectories for rbv2_ranger...
+Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   0%|                                                                                                                                      | 0/500 [00:00<?, ?it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   0%|▎                                                                                                                             | 1/500 [00:00<04:52,  1.71it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   0%|▌                                                                                                                             | 2/500 [00:01<05:05,  1.63it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   1%|▊                                                                                                                             | 3/500 [00:01<05:02,  1.64it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   1%|█                                                                                                                             | 4/500 [00:02<04:51,  1.70it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   1%|█▎                                                                                                                            | 5/500 [00:02<04:56,  1.67it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   1%|█▌                                                                                                                            | 6/500 [00:03<04:57,  1.66it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   1%|█▊                                                                                                                            | 7/500 [00:04<05:00,  1.64it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   2%|██                                                                                                                            | 8/500 [00:04<04:52,  1.68it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   2%|██▎                                                                                                                           | 9/500 [00:05<04:54,  1.67it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   2%|██▌                                                                                                                          | 10/500 [00:06<05:01,  1.62it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   2%|██▊                                                                                                                          | 11/500 [00:06<04:57,  1.64it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   2%|███                                                                                                                          | 12/500 [00:07<04:54,  1.66it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   3%|███▎                                                                                                                         | 13/500 [00:07<05:10,  1.57it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   3%|███▌                                                                                                                         | 14/500 [00:08<04:57,  1.64it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   3%|███▊                                                                                                                         | 15/500 [00:09<05:04,  1.59it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   3%|████                                                                                                                         | 16/500 [00:09<04:57,  1.63it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   3%|████▎                                                                                                                        | 17/500 [00:10<04:51,  1.66it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   4%|████▌                                                                                                                        | 18/500 [00:10<04:57,  1.62it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger:   4%|████▊                                                                                                                        | 19/500 [00:11<04:54,  1.63it/s]Please make sure to also cite:
+Binder M., Pfisterer F. & Bischl B. (2020). Collecting Empirical Data About Hyperparameters for Data Driven AutoML. 7th ICML Workshop on Automated Machine Learning.
+YAHPO rbv2_ranger: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 500/500 [03:29<00:00,  2.39it/s]
+    Added 3000 YAHPO trajectories
+  Verifying generated data...
+Generated 5000 trajectories
+
+============================================================
+  PHASE 3: Model Training
+============================================================
+
+
+Phase 3: Model Training
+----------------------------------------
+  Creating tokenizer...
+  Loading datasets...
+    Train samples: 4800
+    Val samples: 200
+  Creating model...
+    Model size: 4,789,504 parameters
+    Vocab size: 1158
+    GPU memory (model): 18.3 MB
+  Training for 5000 steps on cuda...
+Training:  10%|██████████▌                                                                                               | 500/5000 [00:53<06:34, 11.39it/s, loss=2.5704, lr=2.95e-04]
+Step 500 - Val Loss: 2.9275
+Saved checkpoint: outputs/smoke_test/model/best.pt
+Training:  20%|█████████████████████                                                                                    | 1000/5000 [01:47<07:40,  8.69it/s, loss=2.5309, lr=2.76e-04]
+Step 1000 - Val Loss: 2.9121
+Saved checkpoint: outputs/smoke_test/model/best.pt
+Training:  25%|██████████████████████████▎                                                                              | 1250/5000 [02:12<07:14,  8.62it/s, loss=2.5062, lr=2.64e-04]Saved checkpoint: outputs/smoke_test/model/step_1250.pt
+Training:  30%|███████████████████████████████▌                                                                         | 1500/5000 [02:37<03:36, 16.16it/s, loss=2.4683, lr=2.43e-04]
+Step 1500 - Val Loss: 2.9338
+Training:  40%|██████████████████████████████████████████                                                               | 2000/5000 [03:28<04:47, 10.43it/s, loss=2.3788, lr=2.02e-04]
+Step 2000 - Val Loss: 3.0045
+Training:  50%|████████████████████████████████████████████████████▌                                                    | 2500/5000 [04:21<03:27, 12.04it/s, loss=2.2876, lr=1.55e-04]
+Step 2500 - Val Loss: 3.0677
+Saved checkpoint: outputs/smoke_test/model/step_2500.pt
+Training:  60%|███████████████████████████████████████████████████████████████                                          | 3000/5000 [05:14<02:18, 14.40it/s, loss=2.2096, lr=1.07e-04]
+Step 3000 - Val Loss: 3.1203
+Training:  70%|█████████████████████████████████████████████████████████████████████████▌                               | 3500/5000 [06:05<02:10, 11.47it/s, loss=2.1411, lr=6.41e-05]
+Step 3500 - Val Loss: 3.1891
+
+Early stopping triggered at step 3500
+Training:  70%|█████████████████████████████████████████████████████████████████████████▌                               | 3500/5000 [06:05<02:36,  9.57it/s, loss=2.1411, lr=6.41e-05]
+Saved checkpoint: outputs/smoke_test/model/final.pt
+
+  Training Results:
+    Initial loss: 7.1085
+    Final loss: 2.1515
+    Best val loss: 2.9121
+    Loss reduction: 69.7%
+    Peak GPU memory: 1697.1 MB (7.0% of total)
+Training complete. Final loss: 2.151529302597046
+  Peak GPU memory: 1697.1 MB
+
+============================================================
+  PHASE 4a: Inference Behavior Test
+============================================================
+
+
+Phase 5b: Inference Logic Check
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+
+  Testing Exploration Behavior (bad history -> explore away)...
+    Bad region center: 0.175
+    Avg distance from bad region: 0.447
+    Sample suggestions: {'x0': 0.1925, 'x1': 0.8915, 'x2': 0.9335}
+    Exploration test: PASS
+
+  Testing Exploitation Behavior (good history -> exploit near best)...
+    Best trial params: {'x0': 0.7508278251930574, 'x1': 0.7512443360153338, 'x2': 0.7591667987093793}
+    Best trial score: 0.0631
+    Avg distance from best: 0.367
+    Sample suggestions: {'x0': 0.0385, 'x1': 0.5615, 'x2': 0.1925}
+    Exploitation test: FAIL
+
+  Checking suggestion validity...
+    All suggestions in bounds: True
+
+  Overall inference check: PASS
+  Exploration test: PASS
+  Exploitation test: FAIL
+
+============================================================
+  PHASE 4b: Synthetic Benchmark Evaluation
+============================================================
+
+
+Phase 4: Synthetic Benchmark Evaluation
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+
+  Testing 2D benchmarks...
+
+Evaluating on sphere (d=2)...
+Seeds for sphere: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01<00:00,  1.53it/s]
+
+Evaluating on rastrigin (d=2)...
+Seeds for rastrigin: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01<00:00,  1.55it/s]
+
+Evaluating on rosenbrock (d=2)...
+Seeds for rosenbrock: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01<00:00,  1.53it/s]
+
+Evaluating on ackley (d=2)...
+Seeds for ackley: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:02<00:00,  1.41it/s]
+
+Evaluating on levy (d=2)...
+Seeds for levy: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01<00:00,  1.51it/s]
+    2D vs Random: 100.0%, vs TPE: 60.0%
+
+  Testing 3D benchmarks...
+
+Evaluating on sphere (d=3)...
+Seeds for sphere: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03<00:00,  1.01s/it]
+
+Evaluating on rastrigin (d=3)...
+Seeds for rastrigin: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03<00:00,  1.02s/it]
+
+Evaluating on rosenbrock (d=3)...
+Seeds for rosenbrock: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03<00:00,  1.02s/it]
+
+Evaluating on ackley (d=3)...
+Seeds for ackley: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03<00:00,  1.02s/it]
+
+Evaluating on levy (d=3)...
+Seeds for levy: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:03<00:00,  1.01s/it]
+    3D vs Random: 93.3%, vs TPE: 13.3%
+
+  Testing 5D benchmarks...
+
+Evaluating on sphere (d=5)...
+Seeds for sphere: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:05<00:00,  1.77s/it]
+
+Evaluating on rastrigin (d=5)...
+Seeds for rastrigin: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:05<00:00,  1.76s/it]
+
+Evaluating on rosenbrock (d=5)...
+Seeds for rosenbrock: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:05<00:00,  1.95s/it]
+
+Evaluating on ackley (d=5)...
+Seeds for ackley: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:05<00:00,  1.83s/it]
+
+Evaluating on levy (d=5)...
+Seeds for levy: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:05<00:00,  1.93s/it]
+    5D vs Random: 80.0%, vs TPE: 33.3%
+
+  Overall Results (across 3 dimensions):
+    vs Random: 91.1%
+    vs TPE: 35.6%
+  vs Random: 91.1% win rate
+  vs TPE: 35.6% win rate
+    2D: 100.0% vs Random
+    3D: 93.3% vs Random
+    5D: 80.0% vs Random
+
+============================================================
+  PHASE 5: Real-World ML Evaluation
+============================================================
+
+
+Phase 5: Real-World ML Evaluation
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+
+  Evaluating on MNIST MLP...
+
+Evaluating on MNISTBenchmark...
+Seeds: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [12:39<00:00, 253.18s/it]
+    MNIST Results:
+      OptiFormer best error: 0.0658
+      TPE best error: 0.0635
+      Random best error: 0.0602
+      vs Random win rate: 33.3%
+
+  mnist_mlp:
+    OptiFormer best: 0.06579999999999997
+    TPE best: 0.0635
+    Random best: 0.06020000000000003
+
+============================================================
+  PHASE 4c: Categorical Parameter Tests
+============================================================
+
+
+Phase 4c: Categorical Parameter Evaluation
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+
+  Testing: mixed_nn_config
+    Neural network with mixed hyperparameter types
+    Valid rate: 100.0%
+    Diversity OK: True
+    vs Random: 33.3%
+    Passed: True
+
+  Testing: pure_categorical
+    All categorical parameters
+    Valid rate: 100.0%
+    Diversity OK: True
+    vs Random: 0.0%
+    Passed: True
+
+  Testing: many_categories
+    Parameters with many categorical choices
+    Valid rate: 100.0%
+    Diversity OK: True
+    vs Random: 100.0%
+    Passed: True
+
+  Overall Results:
+    Valid rate: 100.0%
+    All passed: True
+  Valid rate: 100.0%
+  All passed: True
+
+============================================================
+  PHASE 4d: Edge Case Tests
+============================================================
+
+
+Phase 4d: Edge Case Evaluation
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+    Testing bounds handling...
+      In-bounds rate: 100.0%
+    Testing long trajectories...
+      Length 50: OK
+      Length 100: OK
+      Length 150: OK
+    Testing score edge cases...
+      normal: OK
+      negative: OK
+      very_small: OK
+      large: OK
+    Testing duplicate handling...
+      Success: True, Diverse: False
+    Testing single dimension (d=1)...
+      Generated 5 valid values
+    Testing high dimension (d=20)...
+      Success: True
+
+  Overall Results:
+    Passed: 6/6
+    Pass rate: 100.0%
+  Pass rate: 100.0%
+  Passed: 6/6
+
+============================================================
+  PHASE 6: Optuna Integration Test
+============================================================
+
+
+Phase 6: Optuna Integration Test
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+  Creating OptiFormerSampler...
+  Running optimization study (15 trials)...
+
+  Checking suggestion validity...
+    All suggestions in bounds: True
+
+  Checking for adaptation behavior...
+    Early trials avg value: 5.3168
+    Late trials avg value: 9.1994
+    Shows adaptation: False
+
+  Checking proximity to optimum...
+    Optimum: x_i = 2.0 for all i
+    Best found: {'x0': 1.4982135617085608, 'x1': 2.541123724024793, 'x2': 3.237010422081962}
+    Best value: 2.0748
+    Avg distance from optimum: 0.7600
+
+  Study Summary:
+    Trials completed: 15
+    Best objective value: 2.0748
+
+  Optuna integration test: PASS
+  Study completed: True
+  Best value: 2.074799298695062
+  All valid: True
+  Shows adaptation: False
+
+============================================================
+  FINAL VERDICT
+============================================================
+
+Criteria Check:
+  [PASS] tokenizer_pass: True
+  [PASS] data_generated: True
+  [PASS] training_converged: True
+  [PASS] inference_behavior: True
+  [PASS] beats_random_synthetic: True
+  [PASS] categorical_handling: True
+  [PASS] edge_cases_pass: True
+  [PASS] optuna_integration: True
+  [PASS] beats_random_ml: True
+
+============================================================
+  SMOKE TEST PASSED
+  OptiFormer is ready for full-scale training!
+============================================================
+
+Total time: 42.0 minutes
+(main) root@C.30367056:/wor
