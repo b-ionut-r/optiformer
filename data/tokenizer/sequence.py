@@ -123,8 +123,11 @@ class SequenceTokenizer:
         for trial in trials:
             tokens.append(self.vocab.trial_sep_token_id)
 
-            # Parameters in fixed order
+            # Parameters in fixed order (only encode params that exist in trial)
             for param_name in self.param_order:
+                if param_name not in trial.params:
+                    continue  # Skip params not in this trial (variable-dim support)
+
                 spec = self.param_specs[param_name]
                 tokens.append(self.vocab.get_param_token(param_name))
 
@@ -241,6 +244,9 @@ class SequenceTokenizer:
         for trial in history:
             tokens.append(self.vocab.trial_sep_token_id)
             for param_name in self.param_order:
+                if param_name not in trial.params:
+                    continue  # Skip params not in this trial (variable-dim support)
+
                 spec = self.param_specs[param_name]
                 tokens.append(self.vocab.get_param_token(param_name))
 
