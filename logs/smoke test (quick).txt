@@ -1,0 +1,308 @@
+python -m smoke_test.run_all --quick
+
+============================================================
+  OptiFormer-Lite Smoke Test
+  Started: 2026-01-22 20:30:06
+============================================================
+
+============================================================
+  PHASE 1: Tokenizer Validation
+============================================================
+
+
+Phase 1: Tokenizer Validation
+----------------------------------------
+  Testing numerical tokenizer...
+    Numerical tokenizer: PASS
+  Testing sequence tokenizer...
+    Sequence tokenizer: PASS
+Tokenizer tests passed
+
+============================================================
+  PHASE 2: Data Generation
+============================================================
+
+
+Phase 2: Data Generation
+----------------------------------------
+  Generating 100 GP functions...
+    Generated 100 GP functions
+  Generating 100 symbolic functions...
+    Generated 100 symbolic functions
+  Generating training trajectories (100 functions)...
+Training trajectories: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:02<00:00, 38.13it/s]
+  Generating validation trajectories (100 functions)...
+Validation trajectories: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:02<00:00, 44.41it/s]
+    Total trajectories: 200
+    Train: 100, Val: 100
+  Verifying generated data...
+Generated 200 trajectories
+
+============================================================
+  PHASE 3: Model Training
+============================================================
+
+
+Phase 3: Model Training
+----------------------------------------
+  Creating tokenizer...
+  Loading datasets...
+    Train samples: 100
+    Val samples: 100
+  Creating model...
+    Model size: 4,789,504 parameters
+    Vocab size: 1158
+    GPU memory (model): 18.3 MB
+  Training for 500 steps on cuda...
+Training:  20%|█████████████████████▍                                                                                     | 100/500 [00:12<00:45,  8.87it/s, loss=3.0506, lr=2.91e-04]
+Step 100 - Val Loss: 2.9843
+Saved checkpoint: outputs/smoke_test/model/best.pt
+Training:  40%|██████████████████████████████████████████▊                                                                | 200/500 [00:23<00:32,  9.28it/s, loss=1.3416, lr=2.24e-04]
+Step 200 - Val Loss: 2.7121
+Saved checkpoint: outputs/smoke_test/model/best.pt
+Training:  60%|████████████████████████████████████████████████████████████████▏                                          | 300/500 [00:35<00:21,  9.15it/s, loss=0.5955, lr=1.23e-04]
+Step 300 - Val Loss: 2.7193
+Training:  80%|█████████████████████████████████████████████████████████████████████████████████████▌                     | 400/500 [00:45<00:10,  9.48it/s, loss=0.4514, lr=3.44e-05]
+Step 400 - Val Loss: 2.8266
+Training: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████| 500/500 [00:56<00:00,  8.82it/s, loss=0.4272, lr=2.96e-07]
+Saved checkpoint: outputs/smoke_test/model/final.pt
+
+  Training Results:
+    Initial loss: 6.9852
+    Final loss: 0.4302
+    Best val loss: 2.7121
+    Loss reduction: 93.8%
+    Peak GPU memory: 758.8 MB (3.1% of total)
+Training complete. Final loss: 0.43021717548370364
+  Peak GPU memory: 758.8 MB
+
+============================================================
+  PHASE 4a: Inference Behavior Test
+============================================================
+
+
+Phase 5b: Inference Logic Check
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+
+  Testing Exploration Behavior (bad history -> explore away)...
+    Bad region center: 0.175
+    Avg distance from bad region: 0.360
+    Sample suggestions: {'x0': 0.5635, 'x1': 0.5225, 'x2': 0.4825}
+    Exploration test: PASS
+
+  Testing Exploitation Behavior (good history -> exploit near best)...
+    Best trial params: {'x0': 0.7406781674772354, 'x1': 0.7447800009973291, 'x2': 0.7411011614559773}
+    Best trial score: 0.0311
+    Avg distance from best: 0.238
+    Sample suggestions: {'x0': 0.4625, 'x1': 0.9375, 'x2': 0.5075}
+    Exploitation test: PASS
+
+  Checking suggestion validity...
+    All suggestions in bounds: True
+
+  Overall inference check: PASS
+  Exploration test: PASS
+  Exploitation test: PASS
+
+============================================================
+  PHASE 4b: Synthetic Benchmark Evaluation
+============================================================
+
+
+Phase 4: Synthetic Benchmark Evaluation
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+
+  Testing 2D benchmarks...
+
+Evaluating on sphere (d=2)...
+Seeds for sphere: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  6.76it/s]
+
+Evaluating on rastrigin (d=2)...
+Seeds for rastrigin: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  7.50it/s]
+
+Evaluating on rosenbrock (d=2)...
+Seeds for rosenbrock: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  7.18it/s]
+
+Evaluating on ackley (d=2)...
+Seeds for ackley: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  7.41it/s]
+
+Evaluating on levy (d=2)...
+Seeds for levy: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  7.35it/s]
+    2D vs Random: 100.0%, vs TPE: 100.0%
+
+  Testing 3D benchmarks...
+
+Evaluating on sphere (d=3)...
+Seeds for sphere: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  4.53it/s]
+
+Evaluating on rastrigin (d=3)...
+Seeds for rastrigin: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  4.88it/s]
+
+Evaluating on rosenbrock (d=3)...
+Seeds for rosenbrock: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  4.89it/s]
+
+Evaluating on ackley (d=3)...
+Seeds for ackley: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  4.79it/s]
+
+Evaluating on levy (d=3)...
+Seeds for levy: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  4.61it/s]
+    3D vs Random: 90.0%, vs TPE: 70.0%
+
+  Overall Results (across 2 dimensions):
+    vs Random: 95.0%
+    vs TPE: 85.0%
+  vs Random: 95.0% win rate
+  vs TPE: 85.0% win rate
+    2D: 100.0% vs Random
+    3D: 90.0% vs Random
+
+============================================================
+  PHASE 5: Real-World ML Evaluation
+============================================================
+
+
+Phase 5: Real-World ML Evaluation
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+
+  Evaluating on MNIST MLP...
+
+Evaluating on MNISTBenchmark...
+Seeds: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2/2 [01:48<00:00, 54.27s/it]
+    MNIST Results:
+      OptiFormer best error: 0.0890
+      TPE best error: 0.0796
+      Random best error: 0.0813
+      vs Random win rate: 50.0%
+
+  mnist_mlp:
+    OptiFormer best: 0.08899999999999997
+    TPE best: 0.0796
+    Random best: 0.08130000000000004
+
+============================================================
+  PHASE 4c: Categorical Parameter Tests
+============================================================
+
+
+Phase 4c: Categorical Parameter Evaluation
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+
+  Testing: mixed_nn_config
+    Neural network with mixed hyperparameter types
+    Valid rate: 100.0%
+    Diversity OK: True
+    vs Random: 66.7%
+    Passed: True
+
+  Testing: pure_categorical
+    All categorical parameters
+    Valid rate: 100.0%
+    Diversity OK: True
+    vs Random: 33.3%
+    Passed: True
+
+  Testing: many_categories
+    Parameters with many categorical choices
+    Valid rate: 100.0%
+    Diversity OK: True
+    vs Random: 100.0%
+    Passed: True
+
+  Overall Results:
+    Valid rate: 100.0%
+    All passed: True
+  Valid rate: 100.0%
+  All passed: True
+
+============================================================
+  PHASE 4d: Edge Case Tests
+============================================================
+
+
+Phase 4d: Edge Case Evaluation
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+    Testing bounds handling...
+      In-bounds rate: 100.0%
+    Testing long trajectories...
+      Length 50: OK
+      Length 100: OK
+      Length 150: OK
+    Testing score edge cases...
+      normal: OK
+      negative: OK
+      very_small: OK
+      large: OK
+    Testing duplicate handling...
+      Success: True, Diverse: False
+    Testing single dimension (d=1)...
+      Generated 5 valid values
+    Testing high dimension (d=20)...
+      Success: True
+
+  Overall Results:
+    Passed: 6/6
+    Pass rate: 100.0%
+  Pass rate: 100.0%
+  Passed: 6/6
+
+============================================================
+  PHASE 6: Optuna Integration Test
+============================================================
+
+
+Phase 6: Optuna Integration Test
+----------------------------------------
+  Loading model from outputs/smoke_test/model/best.pt...
+  Creating OptiFormerSampler...
+  Running optimization study (10 trials)...
+
+  Checking suggestion validity...
+    All suggestions in bounds: True
+
+  Checking for adaptation behavior...
+    Early trials avg value: 6.5183
+    Late trials avg value: 5.3318
+    Shows adaptation: True
+
+  Checking proximity to optimum...
+    Optimum: x_i = 2.0 for all i
+    Best found: {'x0': 1.62827711384897, 'x1': 2.238552315118624, 'x2': 3.054129745711027}
+    Best value: 1.3063
+    Avg distance from optimum: 0.5548
+
+  Study Summary:
+    Trials completed: 10
+    Best objective value: 1.3063
+
+  Optuna integration test: PASS
+  Study completed: True
+  Best value: 1.3062746319297007
+  All valid: True
+  Shows adaptation: True
+
+============================================================
+  FINAL VERDICT
+============================================================
+
+Criteria Check:
+  [PASS] tokenizer_pass: True
+  [PASS] data_generated: True
+  [PASS] training_converged: True
+  [PASS] inference_behavior: True
+  [PASS] beats_random_synthetic: True
+  [PASS] categorical_handling: True
+  [PASS] edge_cases_pass: True
+  [PASS] optuna_integration: True
+  [PASS] beats_random_ml: True
+
+============================================================
+  SMOKE TEST PASSED
+  OptiFormer is ready for full-scale training!
+============================================================
+
+Total time: 3.0 minutes
